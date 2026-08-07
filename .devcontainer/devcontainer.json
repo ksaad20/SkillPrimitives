@@ -1,0 +1,47 @@
+{
+  "name": "Skill Primitives",
+  "image": "mcr.microsoft.com/devcontainers/python:3.11",
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.black-formatter",
+        "charliermarsh.ruff",
+        "ms-python.mypy-type-checker",
+        "ms-toolsai.jupyter",
+        "GitHub.vscode-pull-request-github"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.testing.pytestEnabled": true,
+        "python.testing.pytestArgs": ["tests"],
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.codeActionsOnSave": {
+          "source.organizeImports": "explicit"
+        },
+        "black-formatter.args": ["--line-length", "100"],
+        "ruff.organizeImports": true,
+        "ruff.lint.run": "onSave",
+        "ruff.format.enable": false,
+        "mypy-type-checker.args": ["--show-error-codes"],
+        "files.exclude": {
+          "**/__pycache__": true,
+          "**/.pytest_cache": true,
+          "**/.mypy_cache": true,
+          "**/.ruff_cache": true,
+          "**/dist": true,
+          "**/build": true,
+          "**/*.egg-info": true
+        }
+      }
+    }
+  },
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+  "postStartCommand": "git config --global --add safe.directory /workspaces/SkillPrimitives",
+  "remoteUser": "vscode"
+}
