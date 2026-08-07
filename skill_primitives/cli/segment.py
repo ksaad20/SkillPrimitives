@@ -14,21 +14,21 @@ from pathlib import Path
 
 import numpy as np
 
-from skill_primitives.core.segmenter import segment_episode
 from skill_primitives.core.annotator import Annotator
-from skill_primitives.primitives.registry import detect_all
+from skill_primitives.core.segmenter import segment_episode
+from skill_primitives.io.lerobot_adapter import LeRobotAdapter
 
 
 def main(argv=None):
     parser = argparse.ArgumentParser(
         description="Segment LeRobot episodes into skill primitives",
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Examples:
-  %(prog)s --dataset lerobot/pusht --output ./my_skills/
-  %(prog)s --dataset lerobot/pusht --episodes 0 1 2 --output ./my_skills/
-  %(prog)s --dataset lerobot/pusht --annotate --provider ollama --output ./my_skills/
-        """.strip(),
+        epilog=(
+            "Examples:\n"
+            "  %(prog)s --dataset lerobot/pusht --output ./my_skills/\n"
+            "  %(prog)s --dataset lerobot/pusht --episodes 0 1 2 --output ./my_skills/\n"
+            "  %(prog)s --dataset lerobot/pusht --annotate --provider ollama --output ./my_skills/"
+        ),
     )
     parser.add_argument(
         "--dataset",
@@ -78,14 +78,12 @@ Examples:
     if args.episodes:
         episodes = args.episodes
     else:
-        # Try to list all episodes
         try:
-            from skill_primitives.io.lerobot_adapter import LeRobotAdapter
             adapter = LeRobotAdapter()
             episodes = adapter.list_episodes(args.dataset)
-            print(f"Found {len(episodes)} episodes in {args.dataset}")
+            print("Found {} episodes in {}".format(len(episodes), args.dataset))
         except Exception as e:
-            print(f"Could not list episodes: {e}")
+            print("Could not list episodes: {}".format(e))
             print("Falling back to episode 0 only")
             episodes = [0]
 
@@ -96,16 +94,16 @@ Examples:
     total_segments = 0
 
     for ep_idx in episodes:
-        print(f"
-Processing episode {ep_idx}...")
+        print("")
+        print("Processing episode {}...".format(ep_idx))
 
         try:
             primitives = segment_episode(args.dataset, episode=ep_idx)
         except Exception as e:
-            print(f"  Failed to segment episode {ep_idx}: {e}")
+            print("  Failed to segment episode {}: {}".format(ep_idx, e))
             continue
 
-        print(f"  Found {len(primitives)} primitives")
+        print("  Found {} primitives".format(len(primitives)))
 
         # Annotate if requested
         if annotator:
@@ -118,20 +116,20 @@ Processing episode {ep_idx}...")
             pdir.mkdir(exist_ok=True)
 
             # Write metadata
-            meta_path = pdir / f"episode_{ep_idx:03d}_seg_{i:03d}.json"
+            meta_path = pdir / "episode_{:03d}_seg_{:03d}.json".format(ep_idx, i)
             with open(meta_path, "w") as f:
                 json.dump(primitive, f, indent=2)
 
             total_segments += 1
 
-    print(f"
-{'='*50}")
-    print(f"Segmentation complete!")
-    print(f"  Dataset: {args.dataset}")
-    print(f"  Episodes: {len(episodes)}")
-    print(f"  Total segments: {total_segments}")
-    print(f"  Output: {out_dir.absolute()}")
-    print(f"{'='*50}")
+    print("")
+    print("{}".format("=" * 50))
+    print("Segmentation complete!")
+    print("  Dataset: {}".format(args.dataset))
+    print("  Episodes: {}".format(len(episodes)))
+    print("  Total segments: {}".format(total_segments))
+    print("  Output: {}".format(out_dir.absolute()))
+    print("{}".format("=" * 50))
 
     return 0
 
