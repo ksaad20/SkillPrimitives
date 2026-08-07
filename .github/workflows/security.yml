@@ -50,10 +50,12 @@ jobs:
       - name: Install pip-audit
         run: python -m pip install pip-audit
 
-      - name: Install package (pulls in all dependencies)
+      - name: Upgrade core build tools (fixes setuptools CVEs)
         run: |
-          python -m pip install --upgrade pip
-          pip install -e ".[dev]"
+          python -m pip install --upgrade pip setuptools wheel
+
+      - name: Install package (pulls in all dependencies)
+        run: pip install -e ".[dev]"
 
       - name: Audit installed dependencies
         run: pip-audit --desc
@@ -73,8 +75,16 @@ jobs:
       - name: Install bandit
         run: python -m pip install bandit[toml]
 
-      - name: Run Bandit
+      - name: Run Bandit (console output)
+        run: bandit -r skill_primitives -ll
+
+      - name: Generate JSON report on failure
+        if: failure()
         run: bandit -r skill_primitives -f json -o bandit-report.json
+
+      - name: Print Bandit JSON report
+        if: failure()
+        run: cat bandit-report.json | python -m json.tool
 
       - name: Upload Bandit report
         if: failure()
