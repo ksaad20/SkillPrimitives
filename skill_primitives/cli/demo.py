@@ -6,11 +6,13 @@ Usage:
 
 from __future__ import annotations
 
+import json
 import sys
+import tempfile
 
-from skill_primitives.core.segmenter import segment_episode
-from skill_primitives.core.composer import compose
 from skill_primitives.core.annotator import Annotator
+from skill_primitives.core.composer import compose
+from skill_primitives.core.segmenter import segment_episode
 
 
 def main(argv=None):
@@ -20,8 +22,8 @@ def main(argv=None):
     print("=" * 60)
 
     # Step 1: Segment
-    print("
-[1/4] Segmenting a sample LeRobot episode...")
+    print("")
+    print("[1/4] Segmenting a sample LeRobot episode...")
     print("      Dataset: lerobot/pusht")
     print("      Episode: 0")
 
@@ -29,7 +31,7 @@ def main(argv=None):
         primitives = segment_episode("lerobot/pusht", episode=0)
         source = "live"
     except Exception as e:
-        print(f"      Note: Using synthetic fallback ({e})")
+        print("      Note: Using synthetic fallback ({})".format(e))
         primitives = [
             {"type": "reach", "start": 0, "end": 15, "confidence": 0.92},
             {"type": "grasp", "start": 15, "end": 25, "confidence": 0.88},
@@ -38,24 +40,25 @@ def main(argv=None):
         ]
         source = "synthetic"
 
-    print(f"
-      Detected {len(primitives)} primitives ({source}):")
+    print("")
+    print("      Detected {} primitives ({})".format(len(primitives), source))
     for p in primitives:
-        print(f"        {p['type']:10s} | frames {p['start']:3d}-{p['end']:3d} | conf={p['confidence']:.2f}")
+        line = "        {:10s} | frames {:3d}-{:3d} | conf={:.2f}".format(p["type"], p["start"], p["end"], p["confidence"])
+        print(line)
 
     # Step 2: Annotate
-    print("
-[2/4] Annotating with natural language...")
+    print("")
+    print("[2/4] Annotating with natural language...")
     annotator = Annotator()
     annotated = annotator.annotate_batch(primitives)
 
     print("      Descriptions:")
     for p in annotated:
-        print(f"        [{p['type']:10s}] {p['description']}")
+        print("        [{:10s}] {}".format(p["type"], p["description"]))
 
     # Step 3: Compose novel task
-    print("
-[3/4] Composing a novel task (never in training data)...")
+    print("")
+    print("[3/4] Composing a novel task (never in training data)...")
     novel_instructions = [
         "reach the screwdriver",
         "grasp the handle firmly",
@@ -67,20 +70,18 @@ def main(argv=None):
 
     print("      Instructions:")
     for i, inst in enumerate(novel_instructions, 1):
-        print(f"        {i}. {inst}")
+        print("        {}. {}".format(i, inst))
 
     task = compose(novel_instructions)
 
-    print(f"
-      Composed {len(task.primitives)} primitives:")
+    print("")
+    print("      Composed {} primitives:".format(len(task.primitives)))
     for i, p in enumerate(task.primitives, 1):
-        print(f"        {i}. [{p['type']:12s}] {p['instruction']}")
+        print("        {}. [{:12s}] {}".format(i, p["type"], p["instruction"]))
 
     # Step 4: Export
-    print("
-[4/4] Exporting composed task...")
-    import tempfile
-    import json
+    print("")
+    print("[4/4] Exporting composed task...")
 
     tmp = tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False)
     task.export_json(tmp.name)
@@ -90,16 +91,16 @@ def main(argv=None):
     with open(tmp.name) as f:
         exported = json.load(f)
 
-    print(f"      Exported to: {tmp.name}")
-    print(f"      Task duration: {exported['task']['estimated_duration']:.1f}s")
-    print(f"      Num primitives: {exported['task']['num_primitives']}")
+    print("      Exported to: {}".format(tmp.name))
+    print("      Task duration: {:.1f}s".format(exported["task"]["estimated_duration"]))
+    print("      Num primitives: {}".format(exported["task"]["num_primitives"]))
 
-    print("
-" + "=" * 60)
+    print("")
+    print("=" * 60)
     print("  Demo complete!")
     print("  Try it yourself:")
     print("    python -m skill_primitives.segment --dataset lerobot/pusht --output ./skills/")
-    print("    python -m skill_primitives.compose --library ./skills/ --instructions "reach" "grasp" "lift"")
+    print("    python -m skill_primitives.compose --library ./skills/ --instructions \"reach\" \"grasp\" \"lift\"")
     print("=" * 60)
 
     return 0
