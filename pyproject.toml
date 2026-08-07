@@ -10,7 +10,7 @@ readme = "README.md"
 license = { text = "Apache-2.0" }
 requires-python = ">=3.9"
 authors = [
-    { name = "YOUR_NAME", email = "your.email@example.com" },
+    { name = "Asif Kazi", email = "kazisaadasif29@gmail.com" },
 ]
 keywords = [
     "robotics",
@@ -93,12 +93,11 @@ sp-compose = "skill_primitives.cli.compose:main"
 sp-demo = "skill_primitives.cli.demo:main"
 
 [project.urls]
-Homepage = "https://github.com/YOUR_USERNAME/skill-primitives"
-Documentation = "https://github.com/YOUR_USERNAME/skill-primitives#readme"
-Repository = "https://github.com/YOUR_USERNAME/skill-primitives.git"
-Issues = "https://github.com/YOUR_USERNAME/skill-primitives/issues"
-Changelog = "https://github.com/YOUR_USERNAME/skill-primitives/blob/main/CHANGELOG.md"
-"Paper (JOSS)" = "https://doi.org/10.21105/joss.00000"
+Homepage = "https://github.com/ksaad20/skill-primitives"
+Documentation = "https://github.com/ksaad20/skill-primitives#readme"
+Repository = "https://github.com/ksaad20/skill-primitives.git"
+Issues = "https://github.com/ksaad20/skill-primitives/issues"
+Changelog = "https://github.com/ksaad20/skill-primitives/blob/main/CHANGELOG.md"
 
 [tool.hatch.build.targets.wheel]
 packages = ["skill_primitives"]
