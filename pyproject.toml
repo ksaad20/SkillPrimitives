@@ -110,14 +110,49 @@ include = [
     "/CITATION.cff",
 ]
 
+# ── Black ────────────────────────────────────────────────────────────────────
 [tool.black]
 line-length = 100
 target-version = ["py39", "py310", "py311", "py312"]
 include = '\.pyi?$'
+extend-exclude = '''
+/(
+    \.git
+  | \.venv
+  | \.env
+  | venv
+  | env
+  | build
+  | dist
+  | __pycache__
+  | \.mypy_cache
+  | \.pytest_cache
+  | \.ruff_cache
+  | node_modules
+)/
+'''
 
+# ── isort ────────────────────────────────────────────────────────────────────
+[tool.isort]
+profile = "black"
+line_length = 100
+known_first_party = ["skill_primitives"]
+skip = [
+    ".git",
+    ".venv",
+    "venv",
+    "build",
+    "dist",
+    "__pycache__",
+    "node_modules",
+]
+
+# ── Ruff ─────────────────────────────────────────────────────────────────────
 [tool.ruff]
 line-length = 100
 target-version = "py39"
+
+[tool.ruff.lint]
 select = [
     "E",   # pycodestyle errors
     "F",   # Pyflakes
@@ -131,6 +166,19 @@ select = [
 ]
 ignore = ["E501"]
 
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.isort]
+known-first-party = ["skill_primitives"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+# ── mypy ─────────────────────────────────────────────────────────────────────
 [tool.mypy]
 python_version = "3.9"
 warn_return_any = true
@@ -145,10 +193,29 @@ warn_unused_ignores = true
 warn_no_return = true
 warn_unreachable = true
 strict_equality = true
+show_error_codes = true
 
+[[tool.mypy.overrides]]
+module = [
+    "PIL.*",
+    "yaml",
+    "datasets.*",
+    "huggingface_hub.*",
+    "lerobot.*",
+    "groq.*",
+    "ollama.*",
+    "imageio.*",
+    "imageio_ffmpeg.*",
+]
+ignore_missing_imports = true
+
+# ── pytest ───────────────────────────────────────────────────────────────────
 [tool.pytest.ini_options]
 minversion = "7.0"
 testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
 addopts = "-ra -q --strict-markers --tb=short"
 markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
@@ -156,9 +223,14 @@ markers = [
     "integration: marks integration tests",
 ]
 
+# ── Coverage ─────────────────────────────────────────────────────────────────
 [tool.coverage.run]
 source = ["skill_primitives"]
 branch = true
+omit = [
+    "*/tests/*",
+    "*/test_*",
+]
 
 [tool.coverage.report]
 exclude_lines = [
@@ -169,3 +241,6 @@ exclude_lines = [
     "if __name__ == .__main__.:",
     "if TYPE_CHECKING:",
 ]
+fail_under = 80
+show_missing = true
+skip_covered = false
