@@ -1,0 +1,37 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite both the software and the paper."
+
+title: "Skill Primitives: Natural Language to Robot Motion"
+abstract: "Decompose robotics training datasets into composable skill primitives and annotate them with natural language instructions. Built on LeRobot."
+type: software
+authors:
+  - family-names: "YOUR_LAST_NAME"
+    given-names: "YOUR_FIRST_NAME"
+    orcid: "https://orcid.org/0000-0000-0000-0000"
+repository-code: "https://github.com/YOUR_USERNAME/skill-primitives"
+url: "https://github.com/YOUR_USERNAME/skill-primitives"
+license: Apache-2.0
+date-released: 2026-08-07
+keywords:
+  - robotics
+  - robot learning
+  - imitation learning
+  - leobot
+  - skill composition
+  - natural language
+  - manipulation
+  - trajectory segmentation
+preferred-citation:
+  type: article
+  title: "Skill Primitives: Composable Natural Language Skills for Robot Manipulation"
+  authors:
+    - family-names: "Kazi"
+      given-names: "Asif"
+      orcid: "0000-0003-0560-9117"
+  journal: "Journal of Open Source Software"
+  year: 2026
+  volume: 0
+  issue: 0
+  start: 0
+  end: 0
+  doi: ""
