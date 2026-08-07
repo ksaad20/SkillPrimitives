@@ -43,7 +43,7 @@ class LeRobotAdapter(BaseAdapter):
                 "Install with: pip install datasets"
             )
 
-        ds = load_dataset(dataset_path, split="train", streaming=False)
+        ds = load_dataset(dataset_path, split="train", streaming=False, revision="main")
 
         # Filter to specific episode
         if "episode_index" in ds.column_names:
@@ -145,7 +145,7 @@ class LeRobotAdapter(BaseAdapter):
                 "Install with: pip install datasets"
             )
 
-        ds = load_dataset(dataset_path, split="train", streaming=False)
+        ds = load_dataset(dataset_path, split="train", streaming=False, revision="main")
 
         if "episode_index" in ds.column_names:
             episodes = sorted(set(ds["episode_index"]))
