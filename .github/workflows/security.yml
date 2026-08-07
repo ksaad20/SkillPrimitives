@@ -1,0 +1,105 @@
+name: Security
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  schedule:
+    # Run weekly on Mondays at 09:00 UTC
+    - cron: '0 9 * * 1'
+
+permissions:
+  contents: read
+  security-events: write    # Required for CodeQL SARIF upload
+
+env:
+  FORCE_COLOR: "1"
+
+jobs:
+  # ── 1. CodeQL Analysis (static analysis for security vulnerabilities) ─────
+  codeql:
+    name: CodeQL
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: python
+          queries: security-extended,security-and-quality
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+
+  # ── 2. Dependency Vulnerability Audit (pip-audit) ─────────────────────────
+  audit:
+    name: Dependency Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install pip-audit
+        run: python -m pip install pip-audit
+
+      - name: Audit dependencies
+        run: |
+          # Audit pyproject.toml dependencies
+          pip-audit --desc --requirement pyproject.toml || true
+          # If you have a lockfile, audit that instead for precision:
+          # pip-audit --desc --requirement requirements.txt
+
+  # ── 3. Bandit (Python security linter) ────────────────────────────────────
+  bandit:
+    name: Bandit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install bandit
+        run: python -m pip install bandit[toml]
+
+      - name: Run Bandit
+        run: bandit -r skill_primitives -f json -o bandit-report.json || true
+
+      - name: Upload Bandit report
+        uses: actions/upload-artifact@v4
+        with:
+          name: bandit-report
+          path: bandit-report.json
+          retention-days: 30
+
+  # ── 4. Secret scanning (detect-secrets or trufflehog alternative) ─────────
+  secrets:
+    name: Secret Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Secret detection
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: main
+          head: HEAD
+          extra_args: --debug --only-verified
