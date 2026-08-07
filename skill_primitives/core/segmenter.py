@@ -33,7 +33,9 @@ def load_lerobot_episode(dataset_name: str, episode: int = 0) -> dict[str, Any]:
             "Install it with: pip install datasets"
         )
 
-    ds = load_dataset(dataset_name, split="train", streaming=False, revision="main")
+    ds = load_dataset(
+    dataset_name, split="train", streaming=False, revision="main"
+)  # nosec B615 - intentionally tracking main branch for latest data
 
     # LeRobot datasets have an 'episode_index' field
     if "episode_index" in ds.column_names:
