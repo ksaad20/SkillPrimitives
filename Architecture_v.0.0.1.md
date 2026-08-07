@@ -1,3 +1,5 @@
+```
+
 skill-primitives/
 │
 ├── README.md                          # The landing page. Optimized for 10-second conversion.
