@@ -199,15 +199,15 @@ class ROS2Exporter(BaseExporter):
 
         for i, p in enumerate(primitives):
             desc = p.get("description", p.get("type", "unknown"))
-            lines.append(f'        self.publish_skill({i}, "{desc}")')
+            lines.append("        self.publish_skill({}, \"{}\")".format(i, desc))
 
         lines.extend([
             "",
             "    def publish_skill(self, index, description):",
             '        msg = String()',
-            '        msg.data = f"{{index}}: {{description}}"',
+            '        msg.data = "{}: {}".format(index, description)',
             "        self.publisher.publish(msg)",
-            '        self.get_logger().info(f"Published: {{msg.data}}")',
+            '        self.get_logger().info("Published: {}".format(msg.data))',
             "",
             "def main(args=None):",
             "    rclpy.init(args=args)",
@@ -222,8 +222,8 @@ class ROS2Exporter(BaseExporter):
         ])
 
         with open(path, "w") as f:
-            f.write("
-".join(lines))
+            for line in lines:
+                f.write(line + "\n")
 
 
 def get_exporter(format_name: str) -> BaseExporter:
@@ -247,6 +247,6 @@ def get_exporter(format_name: str) -> BaseExporter:
 
     if format_name.lower() not in exporters:
         available = ", ".join(exporters.keys())
-        raise ValueError(f"Unknown format: '{format_name}'. Available: {available}")
+        raise ValueError("Unknown format: '{}'. Available: {}".format(format_name, available))
 
     return exporters[format_name.lower()]()
