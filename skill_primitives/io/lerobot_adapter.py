@@ -39,8 +39,7 @@ class LeRobotAdapter(BaseAdapter):
             from datasets import load_dataset
         except ImportError:
             raise ImportError(
-                "The 'datasets' library is required. "
-                "Install with: pip install datasets"
+                "The 'datasets' library is required. " "Install with: pip install datasets"
             )
 
         ds = load_dataset(
@@ -143,8 +142,7 @@ class LeRobotAdapter(BaseAdapter):
             from datasets import load_dataset
         except ImportError:
             raise ImportError(
-                "The 'datasets' library is required. "
-                "Install with: pip install datasets"
+                "The 'datasets' library is required. " "Install with: pip install datasets"
             )
 
         ds = load_dataset(

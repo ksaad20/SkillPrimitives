@@ -223,7 +223,11 @@ class TweetCard:
         for i, metric in enumerate(metrics):
             x = start_x + i * (card_w + 24)
             self.draw_metric_card(
-                draw, x, card_y, card_w, card_h,
+                draw,
+                x,
+                card_y,
+                card_w,
+                card_h,
                 label=metric.get("label", ""),
                 value=str(metric.get("value", "—")),
                 unit=metric.get("unit", ""),
@@ -239,14 +243,21 @@ class TweetCard:
         )
 
         font_footer = get_font(18)
-        draw.text((60, self.height - 60), footer, font=font_footer, fill=self.colors["text_secondary"])
+        draw.text(
+            (60, self.height - 60), footer, font=font_footer, fill=self.colors["text_secondary"]
+        )
 
         # Date
         date_str = datetime.now().strftime("%Y-%m-%d")
         font_date = get_font(18)
         bbox = draw.textbbox((0, 0), date_str, font=font_date)
         date_w = bbox[2] - bbox[0]
-        draw.text((self.width - 60 - date_w, self.height - 60), date_str, font=font_date, fill=self.colors["text_secondary"])
+        draw.text(
+            (self.width - 60 - date_w, self.height - 60),
+            date_str,
+            font=font_date,
+            fill=self.colors["text_secondary"],
+        )
 
         # Save
         img.save(output_path, "PNG", optimize=True)
@@ -282,42 +293,52 @@ def extract_metrics(data: Dict) -> List[Dict]:
     if "summary" in data:
         summary = data["summary"]
         if "total_primitives" in summary:
-            metrics.append({
-                "label": "Primitives",
-                "value": summary["total_primitives"],
-                "unit": "",
-            })
+            metrics.append(
+                {
+                    "label": "Primitives",
+                    "value": summary["total_primitives"],
+                    "unit": "",
+                }
+            )
         if "avg_render_time_ms" in summary:
-            metrics.append({
-                "label": "Avg Render",
-                "value": f"{summary['avg_render_time_ms']:.1f}",
-                "unit": "ms",
-                "trend": summary.get("render_trend"),
-            })
+            metrics.append(
+                {
+                    "label": "Avg Render",
+                    "value": f"{summary['avg_render_time_ms']:.1f}",
+                    "unit": "ms",
+                    "trend": summary.get("render_trend"),
+                }
+            )
         if "bundle_size_kb" in summary:
-            metrics.append({
-                "label": "Bundle Size",
-                "value": f"{summary['bundle_size_kb']:.1f}",
-                "unit": "KB",
-                "trend": summary.get("size_trend"),
-            })
+            metrics.append(
+                {
+                    "label": "Bundle Size",
+                    "value": f"{summary['bundle_size_kb']:.1f}",
+                    "unit": "KB",
+                    "trend": summary.get("size_trend"),
+                }
+            )
         if "coverage_percent" in summary:
-            metrics.append({
-                "label": "Coverage",
-                "value": f"{summary['coverage_percent']:.0f}",
-                "unit": "%",
-                "trend": summary.get("coverage_trend"),
-            })
+            metrics.append(
+                {
+                    "label": "Coverage",
+                    "value": f"{summary['coverage_percent']:.0f}",
+                    "unit": "%",
+                    "trend": summary.get("coverage_trend"),
+                }
+            )
 
     # Fallback: just take top-level numeric keys
     if not metrics:
         for key, val in data.items():
             if isinstance(val, (int, float)) and not key.startswith("_"):
-                metrics.append({
-                    "label": key.replace("_", " ").title(),
-                    "value": f"{val:.1f}" if isinstance(val, float) else str(val),
-                    "unit": "",
-                })
+                metrics.append(
+                    {
+                        "label": key.replace("_", " ").title(),
+                        "value": f"{val:.1f}" if isinstance(val, float) else str(val),
+                        "unit": "",
+                    }
+                )
             if len(metrics) >= 4:
                 break
 
@@ -329,8 +350,12 @@ def main():
     parser = argparse.ArgumentParser(description="Generate Twitter/X share card from benchmarks")
     parser.add_argument("--benchmark", type=Path, help="Path to benchmark JSON file")
     parser.add_argument("--latest", action="store_true", help="Use the most recent benchmark")
-    parser.add_argument("--output", type=Path, default=ASSETS_DIR / "tweet_card.png", help="Output PNG path")
-    parser.add_argument("--theme", choices=list(THEMES.keys()), default="dark", help="Card color theme")
+    parser.add_argument(
+        "--output", type=Path, default=ASSETS_DIR / "tweet_card.png", help="Output PNG path"
+    )
+    parser.add_argument(
+        "--theme", choices=list(THEMES.keys()), default="dark", help="Card color theme"
+    )
     parser.add_argument("--title", default="Skills Primitive Zoo", help="Card title")
     parser.add_argument("--subtitle", help="Card subtitle (auto-generated if omitted)")
     parser.add_argument("--logo", type=Path, help="Path to logo image (PNG/SVG)")
@@ -360,7 +385,9 @@ def main():
     if not subtitle:
         version = data.get("version", "")
         date = data.get("date", datetime.now().strftime("%Y-%m-%d"))
-        subtitle = f"Benchmark Results — v{version} • {date}" if version else f"Benchmark Results — {date}"
+        subtitle = (
+            f"Benchmark Results — v{version} • {date}" if version else f"Benchmark Results — {date}"
+        )
 
     # Render
     ASSETS_DIR.mkdir(parents=True, exist_ok=True)

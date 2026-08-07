@@ -35,7 +35,11 @@ class Reach(Primitive):
             return segments
 
         # Compute velocity if not provided
-        vel = velocity if velocity is not None and velocity.size > 0 else self._compute_velocity(state or np.array([]))
+        vel = (
+            velocity
+            if velocity is not None and velocity.size > 0
+            else self._compute_velocity(state or np.array([]))
+        )
         if vel.size == 0:
             return segments
 
@@ -51,13 +55,15 @@ class Reach(Primitive):
         if not grasp_starts:
             # Find sustained motion with open gripper
             for t in range(len(gripper) - 5):
-                if self._gripper_is_open(gripper, t, t + 5) and np.mean(vel_mag[t:t + 5]) > 0.01:
-                    segments.append({
-                        "type": self.name,
-                        "start": int(t),
-                        "end": int(t + 5),
-                        "confidence": 0.75,
-                    })
+                if self._gripper_is_open(gripper, t, t + 5) and np.mean(vel_mag[t : t + 5]) > 0.01:
+                    segments.append(
+                        {
+                            "type": self.name,
+                            "start": int(t),
+                            "end": int(t + 5),
+                            "confidence": 0.75,
+                        }
+                    )
             return segments
 
         # Detect reach before each grasp
@@ -87,12 +93,14 @@ class Reach(Primitive):
             if not self._gripper_is_open(gripper, reach_start, min(reach_end, len(gripper))):
                 continue
 
-            segments.append({
-                "type": self.name,
-                "start": int(reach_start),
-                "end": int(reach_end),
-                "confidence": 0.88,
-            })
+            segments.append(
+                {
+                    "type": self.name,
+                    "start": int(reach_start),
+                    "end": int(reach_end),
+                    "confidence": 0.88,
+                }
+            )
 
         return segments
 

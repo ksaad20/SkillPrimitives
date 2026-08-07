@@ -29,7 +29,11 @@ class Place(Primitive):
         if len(gripper) < 2:
             return segments
 
-        vel = velocity if velocity is not None and velocity.size > 0 else self._compute_velocity(state or np.array([]))
+        vel = (
+            velocity
+            if velocity is not None and velocity.size > 0
+            else self._compute_velocity(state or np.array([]))
+        )
         has_velocity = vel.size > 0 and vel.shape[1] >= 3
 
         for t in range(1, len(gripper)):
@@ -47,12 +51,14 @@ class Place(Primitive):
                     elif abs(z_vel) < 0.005:
                         confidence = 0.92  # Near stationary (gentle place)
 
-                segments.append({
-                    "type": self.name,
-                    "start": int(start),
-                    "end": int(end),
-                    "confidence": float(confidence),
-                })
+                segments.append(
+                    {
+                        "type": self.name,
+                        "start": int(start),
+                        "end": int(end),
+                        "confidence": float(confidence),
+                    }
+                )
 
         return segments
 

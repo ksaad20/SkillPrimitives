@@ -21,9 +21,7 @@ from skill_primitives.primitives.place import Place
 # ---------------------------------------------------------------------------
 
 _PRIMITIVES: dict[str, Type[Primitive]] = {
-    cls.name: cls
-    for cls in [Reach, Grasp, Lift, Transport, Place]
-    if cls.name
+    cls.name: cls for cls in [Reach, Grasp, Lift, Transport, Place] if cls.name
 }
 
 
@@ -46,10 +44,7 @@ def get_primitive(name: str) -> Type[Primitive]:
     """
     if name not in _PRIMITIVES:
         available = ", ".join(sorted(_PRIMITIVES.keys()))
-        raise KeyError(
-            f"Unknown primitive: '{name}'. "
-            f"Available primitives: {available}"
-        )
+        raise KeyError(f"Unknown primitive: '{name}'. " f"Available primitives: {available}")
     return _PRIMITIVES[name]
 
 

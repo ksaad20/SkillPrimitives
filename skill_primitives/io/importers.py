@@ -114,17 +114,13 @@ def import_hdf5(path: str, dataset_key: str = "trajectory") -> dict[str, Any]:
     try:
         import h5py
     except ImportError:
-        raise ImportError(
-            "h5py is required for HDF5 import. "
-            "Install with: pip install h5py"
-        )
+        raise ImportError("h5py is required for HDF5 import. " "Install with: pip install h5py")
 
     with h5py.File(path, "r") as f:
         if dataset_key not in f:
             available = list(f.keys())
             raise KeyError(
-                f"Dataset '{dataset_key}' not found in {path}. "
-                f"Available keys: {available}"
+                f"Dataset '{dataset_key}' not found in {path}. " f"Available keys: {available}"
             )
 
         data = f[dataset_key]

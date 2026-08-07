@@ -112,16 +112,20 @@ class GIFGenerator:
         try:
             from playwright.sync_api import sync_playwright
         except ImportError:
-            console.print("[red]Playwright not installed. Run: pip install playwright && playwright install[/red]")
+            console.print(
+                "[red]Playwright not installed. Run: pip install playwright && playwright install[/red]"
+            )
             sys.exit(1)
 
         frame_paths = []
         with sync_playwright() as p:
             browser = p.chromium.launch()
-            page = browser.new_page(viewport={
-                "width": self.resolution[0],
-                "height": self.resolution[1],
-            })
+            page = browser.new_page(
+                viewport={
+                    "width": self.resolution[0],
+                    "height": self.resolution[1],
+                }
+            )
             page.goto(f"file://{html_path.resolve()}")
 
             # Wait for any animations to settle
@@ -188,14 +192,24 @@ class GIFGenerator:
         # Further optimize with gifsicle if available
         if shutil.which("gifsicle"):
             subprocess.run(
-                ["gifsicle", "--optimize=3", "--colors", "128", "-o", str(output_path), str(output_path)],
+                [
+                    "gifsicle",
+                    "--optimize=3",
+                    "--colors",
+                    "128",
+                    "-o",
+                    str(output_path),
+                    str(output_path),
+                ],
                 check=False,
                 capture_output=True,
             )
             self.stats["optimized"] += 1
 
     # ── Orchestration ──────────────────────────────────────────────────────────
-    def generate(self, primitive_name: Optional[str] = None, dry_run: bool = False, force: bool = False):
+    def generate(
+        self, primitive_name: Optional[str] = None, dry_run: bool = False, force: bool = False
+    ):
         """Generate GIFs for all or selected primitives."""
         console.rule("[bold magenta]🎬 GIF Generator[/bold magenta]")
 
@@ -284,11 +298,30 @@ def main():
     parser.add_argument("--all", action="store_true", help="Generate all GIFs")
     parser.add_argument("--primitive", help="Generate only for this primitive")
     parser.add_argument("--dry-run", action="store_true", help="Show what would be generated")
-    parser.add_argument("--force", action="store_true", help="Force regeneration even if up to date")
-    parser.add_argument("--fps", type=int, default=DEFAULT_FPS, help=f"Frames per second (default: {DEFAULT_FPS})")
-    parser.add_argument("--duration", type=int, default=DEFAULT_DURATION, help=f"Duration in seconds (default: {DEFAULT_DURATION})")
-    parser.add_argument("--width", type=int, default=DEFAULT_RESOLUTION[0], help=f"Viewport width (default: {DEFAULT_RESOLUTION[0]})")
-    parser.add_argument("--height", type=int, default=DEFAULT_RESOLUTION[1], help=f"Viewport height (default: {DEFAULT_RESOLUTION[1]})")
+    parser.add_argument(
+        "--force", action="store_true", help="Force regeneration even if up to date"
+    )
+    parser.add_argument(
+        "--fps", type=int, default=DEFAULT_FPS, help=f"Frames per second (default: {DEFAULT_FPS})"
+    )
+    parser.add_argument(
+        "--duration",
+        type=int,
+        default=DEFAULT_DURATION,
+        help=f"Duration in seconds (default: {DEFAULT_DURATION})",
+    )
+    parser.add_argument(
+        "--width",
+        type=int,
+        default=DEFAULT_RESOLUTION[0],
+        help=f"Viewport width (default: {DEFAULT_RESOLUTION[0]})",
+    )
+    parser.add_argument(
+        "--height",
+        type=int,
+        default=DEFAULT_RESOLUTION[1],
+        help=f"Viewport height (default: {DEFAULT_RESOLUTION[1]})",
+    )
     args = parser.parse_args()
 
     if not args.all and not args.primitive:

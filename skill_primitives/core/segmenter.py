@@ -147,12 +147,14 @@ def detect_grasp_segments(gripper: np.ndarray) -> list[dict[str, Any]]:
             # Grasp detected: capture a window around the transition
             start = max(0, t - 3)
             end = min(len(gripper), t + 5)
-            segments.append({
-                "type": "grasp",
-                "start": int(start),
-                "end": int(end),
-                "confidence": 0.92,
-            })
+            segments.append(
+                {
+                    "type": "grasp",
+                    "start": int(start),
+                    "end": int(end),
+                    "confidence": 0.92,
+                }
+            )
 
     return segments
 
@@ -176,12 +178,14 @@ def detect_place_segments(gripper: np.ndarray) -> list[dict[str, Any]]:
         if gripper[t - 1] < 0.5 and gripper[t] >= 0.5:
             start = max(0, t - 3)
             end = min(len(gripper), t + 5)
-            segments.append({
-                "type": "place",
-                "start": int(start),
-                "end": int(end),
-                "confidence": 0.90,
-            })
+            segments.append(
+                {
+                    "type": "place",
+                    "start": int(start),
+                    "end": int(end),
+                    "confidence": 0.90,
+                }
+            )
 
     return segments
 
@@ -227,12 +231,14 @@ def detect_reach_segments(
 
         # Verify gripper is open during this period
         if np.mean(gripper[reach_start:reach_end]) >= 0.4:
-            segments.append({
-                "type": "reach",
-                "start": int(reach_start),
-                "end": int(reach_end),
-                "confidence": 0.88,
-            })
+            segments.append(
+                {
+                    "type": "reach",
+                    "start": int(reach_start),
+                    "end": int(reach_end),
+                    "confidence": 0.88,
+                }
+            )
 
     return segments
 
@@ -278,7 +284,7 @@ def detect_lift_segments(
 
         lift_start = search_start + int(np.argmax(positive_z))
         # Find where z-velocity drops back down
-        negative_after = np.where(z_vel[int(np.argmax(positive_z)):] <= 0.01)[0]
+        negative_after = np.where(z_vel[int(np.argmax(positive_z)) :] <= 0.01)[0]
         if len(negative_after) > 0:
             lift_end = lift_start + int(negative_after[0])
         else:
@@ -286,12 +292,14 @@ def detect_lift_segments(
 
         # Verify gripper is closed
         if np.mean(gripper[lift_start:lift_end]) < 0.6:
-            segments.append({
-                "type": "lift",
-                "start": int(lift_start),
-                "end": int(lift_end),
-                "confidence": 0.85,
-            })
+            segments.append(
+                {
+                    "type": "lift",
+                    "start": int(lift_start),
+                    "end": int(lift_end),
+                    "confidence": 0.85,
+                }
+            )
 
     return segments
 
@@ -351,12 +359,14 @@ def detect_transport_segments(
 
         # Verify gripper is closed
         if np.mean(gripper[motion_start:motion_end]) < 0.6:
-            segments.append({
-                "type": "transport",
-                "start": int(motion_start),
-                "end": int(motion_end),
-                "confidence": 0.82,
-            })
+            segments.append(
+                {
+                    "type": "transport",
+                    "start": int(motion_start),
+                    "end": int(motion_end),
+                    "confidence": 0.82,
+                }
+            )
 
     return segments
 
@@ -406,17 +416,11 @@ def segment_episode(dataset_name: str, episode: int = 0) -> list[dict[str, Any]]
     place_segments = detect_place_segments(gripper)
     reach_segments = detect_reach_segments(gripper, velocity, grasp_segments)
     lift_segments = detect_lift_segments(gripper, velocity, grasp_segments)
-    transport_segments = detect_transport_segments(
-        gripper, velocity, lift_segments, place_segments
-    )
+    transport_segments = detect_transport_segments(gripper, velocity, lift_segments, place_segments)
 
     # Combine and sort by start frame
     all_segments = (
-        grasp_segments
-        + place_segments
-        + reach_segments
-        + lift_segments
-        + transport_segments
+        grasp_segments + place_segments + reach_segments + lift_segments + transport_segments
     )
     all_segments.sort(key=lambda s: s["start"])
 

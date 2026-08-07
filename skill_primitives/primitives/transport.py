@@ -29,7 +29,11 @@ class Transport(Primitive):
         if len(gripper) < 3:
             return segments
 
-        vel = velocity if velocity is not None and velocity.size > 0 else self._compute_velocity(state or np.array([]))
+        vel = (
+            velocity
+            if velocity is not None and velocity.size > 0
+            else self._compute_velocity(state or np.array([]))
+        )
         if vel.size == 0 or vel.shape[1] < 2:
             return segments
 
@@ -48,12 +52,14 @@ class Transport(Primitive):
                 end = t
 
                 if end - start >= min_transport_frames:
-                    segments.append({
-                        "type": self.name,
-                        "start": int(start),
-                        "end": int(end),
-                        "confidence": 0.85,
-                    })
+                    segments.append(
+                        {
+                            "type": self.name,
+                            "start": int(start),
+                            "end": int(end),
+                            "confidence": 0.85,
+                        }
+                    )
             else:
                 t += 1
 

@@ -69,6 +69,7 @@ class Annotator:
         if self.provider == "ollama":
             try:
                 import ollama
+
                 self._client = ollama
             except ImportError:
                 raise ImportError(
@@ -79,28 +80,25 @@ class Annotator:
         elif self.provider == "groq":
             try:
                 from groq import Groq
+
                 self._client = Groq(api_key=self.api_key)
             except ImportError:
-                raise ImportError(
-                    "Groq SDK not installed. Install with: pip install groq"
-                )
+                raise ImportError("Groq SDK not installed. Install with: pip install groq")
 
         elif self.provider == "openai":
             try:
                 from openai import OpenAI
+
                 kwargs = {"api_key": self.api_key}
                 if self.base_url:
                     kwargs["base_url"] = self.base_url
                 self._client = OpenAI(**kwargs)
             except ImportError:
-                raise ImportError(
-                    "OpenAI SDK not installed. Install with: pip install openai"
-                )
+                raise ImportError("OpenAI SDK not installed. Install with: pip install openai")
 
         else:
             raise ValueError(
-                f"Unknown provider: {self.provider}. "
-                "Supported: ollama, groq, openai"
+                f"Unknown provider: {self.provider}. " "Supported: ollama, groq, openai"
             )
 
         return self._client

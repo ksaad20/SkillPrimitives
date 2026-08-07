@@ -60,7 +60,8 @@ class ZooBuilder:
             sys.exit(1)
 
         candidates = [
-            d for d in self.primitives_dir.iterdir()
+            d
+            for d in self.primitives_dir.iterdir()
             if d.is_dir() and not d.name.startswith((".", "_"))
         ]
 
@@ -92,9 +93,7 @@ class ZooBuilder:
             return None
 
         if spec["category"] not in VALID_CATEGORIES:
-            self.warnings.append(
-                f"{name}: Unknown category '{spec['category']}'"
-            )
+            self.warnings.append(f"{name}: Unknown category '{spec['category']}'")
 
         # Check referenced files exist
         for file_entry in spec.get("files", []):

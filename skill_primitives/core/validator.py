@@ -9,7 +9,6 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-
 # ---------------------------------------------------------------------------
 # Schema definitions
 # ---------------------------------------------------------------------------
@@ -33,6 +32,7 @@ VALID_PRIMITIVE_TYPES = {"reach", "grasp", "lift", "transport", "place"}
 # ---------------------------------------------------------------------------
 # Primitive validation
 # ---------------------------------------------------------------------------
+
 
 def validate_primitive(primitive: dict[str, Any]) -> list[str]:
     """Validate a single primitive dict against the schema.
@@ -65,8 +65,7 @@ def validate_primitive(primitive: dict[str, Any]) -> list[str]:
     ptype = primitive.get("type")
     if ptype is not None and ptype not in VALID_PRIMITIVE_TYPES:
         errors.append(
-            f"Unknown primitive type '{ptype}'. "
-            f"Valid types: {sorted(VALID_PRIMITIVE_TYPES)}"
+            f"Unknown primitive type '{ptype}'. " f"Valid types: {sorted(VALID_PRIMITIVE_TYPES)}"
         )
 
     # Check frame range validity
@@ -110,6 +109,7 @@ def is_valid_primitive(primitive: dict[str, Any]) -> bool:
 # ---------------------------------------------------------------------------
 # Sequence validation
 # ---------------------------------------------------------------------------
+
 
 def validate_sequence(sequence: list[dict[str, Any]]) -> list[str]:
     """Validate a composed sequence of primitives.
@@ -174,27 +174,21 @@ def validate_sequence(sequence: list[dict[str, Any]]) -> list[str]:
         if ptype == "lift":
             preceding = type_order[:i]
             if "grasp" not in preceding:
-                errors.append(
-                    f"Lift at position {i} has no preceding grasp in sequence"
-                )
+                errors.append(f"Lift at position {i} has no preceding grasp in sequence")
 
     # Place should follow lift (or transport)
     for i, ptype in enumerate(type_order):
         if ptype == "place":
             preceding = type_order[:i]
             if "lift" not in preceding and "transport" not in preceding:
-                errors.append(
-                    f"Place at position {i} has no preceding lift or transport"
-                )
+                errors.append(f"Place at position {i} has no preceding lift or transport")
 
     # Transport should follow lift
     for i, ptype in enumerate(type_order):
         if ptype == "transport":
             preceding = type_order[:i]
             if "lift" not in preceding:
-                errors.append(
-                    f"Transport at position {i} has no preceding lift"
-                )
+                errors.append(f"Transport at position {i} has no preceding lift")
 
     return errors
 
@@ -214,6 +208,7 @@ def is_valid_sequence(sequence: list[dict[str, Any]]) -> bool:
 # ---------------------------------------------------------------------------
 # Skill library validation
 # ---------------------------------------------------------------------------
+
 
 def validate_skill_library(path: str) -> list[str]:
     """Validate a skill library directory structure.
@@ -255,24 +250,21 @@ def validate_skill_library(path: str) -> list[str]:
         # Check for at least one metadata.yaml
         meta_files = list(type_dir.rglob("metadata.yaml"))
         if not meta_files:
-            errors.append(
-                f"No metadata.yaml files found in {type_dir}"
-            )
+            errors.append(f"No metadata.yaml files found in {type_dir}")
             continue
 
         # Validate each metadata.yaml
         for meta_file in meta_files:
             try:
                 import yaml
+
                 metadata = yaml.safe_load(meta_file.read_text()) or {}
             except Exception as e:
                 errors.append(f"Failed to parse {meta_file}: {e}")
                 continue
 
             if "description" not in metadata:
-                errors.append(
-                    f"Missing 'description' in {meta_file}"
-                )
+                errors.append(f"Missing 'description' in {meta_file}")
 
     return errors
 
@@ -292,6 +284,7 @@ def is_valid_skill_library(path: str) -> bool:
 # ---------------------------------------------------------------------------
 # Trajectory validation
 # ---------------------------------------------------------------------------
+
 
 def validate_trajectory(trajectory: dict[str, Any]) -> list[str]:
     """Validate a robot trajectory dict.
@@ -317,9 +310,7 @@ def validate_trajectory(trajectory: dict[str, Any]) -> list[str]:
     data_keys = ["actions", "states", "observations", "state"]
     found_keys = [k for k in data_keys if k in trajectory]
     if not found_keys:
-        errors.append(
-            f"Trajectory missing data keys. Expected one of: {data_keys}"
-        )
+        errors.append(f"Trajectory missing data keys. Expected one of: {data_keys}")
         return errors
 
     # Check length consistency across arrays

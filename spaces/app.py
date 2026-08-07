@@ -39,9 +39,7 @@ def segment_dataset(dataset_name: str, episode: int) -> tuple[str, str]:
         "|---|------|--------|------------|",
     ]
     for i, p in enumerate(primitives):
-        lines.append(
-            f"| {i+1} | `{p['type']}` | {p['start']}-{p['end']} | {p['confidence']:.2f} |"
-        )
+        lines.append(f"| {i+1} | `{p['type']}` | {p['start']}-{p['end']} | {p['confidence']:.2f} |")
 
     return "\n".join(lines), json.dumps(primitives, indent=2)
 

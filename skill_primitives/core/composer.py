@@ -82,6 +82,7 @@ class SkillLibrary:
             for meta_file in sorted(type_dir.glob("**/metadata.yaml")):
                 try:
                     import yaml
+
                     metadata = yaml.safe_load(meta_file.read_text()) or {}
                 except Exception:
                     metadata = {}
@@ -91,23 +92,28 @@ class SkillLibrary:
                 # Try to load corresponding parquet trajectory
                 traj_file = meta_file.with_suffix(".parquet")
                 if not traj_file.exists():
-                    traj_file = meta_file.parent / (meta_file.stem.replace("_metadata", "") + ".parquet")
+                    traj_file = meta_file.parent / (
+                        meta_file.stem.replace("_metadata", "") + ".parquet"
+                    )
 
                 trajectory: dict[str, Any] = {}
                 if traj_file.exists():
                     try:
                         import pandas as pd
+
                         df = pd.read_parquet(traj_file)
                         trajectory = {"data": df.to_dict("records")}
                     except Exception:
                         trajectory = {}
 
-                skills.append(Skill(
-                    skill_type=ptype,
-                    description=description,
-                    trajectory=trajectory,
-                    metadata=metadata,
-                ))
+                skills.append(
+                    Skill(
+                        skill_type=ptype,
+                        description=description,
+                        trajectory=trajectory,
+                        metadata=metadata,
+                    )
+                )
 
         return cls(skills)
 
@@ -226,8 +232,7 @@ class ComposedTask:
             import pandas as pd
         except ImportError:
             raise ImportError(
-                "pandas is required for LeRobot export. "
-                "Install with: pip install pandas"
+                "pandas is required for LeRobot export. " "Install with: pip install pandas"
             )
 
         rows = []
@@ -239,25 +244,29 @@ class ComposedTask:
             if skill.trajectory and "data" in skill.trajectory:
                 traj_data = skill.trajectory["data"]
                 for i, frame in enumerate(traj_data):
-                    rows.append({
-                        "timestamp": global_frame * 0.05,
-                        "frame_index": global_frame,
-                        "episode_index": episode_idx,
-                        "action": frame.get("action", [0.0] * 7),
-                        "observation.state": frame.get("state", [0.0] * 7),
-                    })
+                    rows.append(
+                        {
+                            "timestamp": global_frame * 0.05,
+                            "frame_index": global_frame,
+                            "episode_index": episode_idx,
+                            "action": frame.get("action", [0.0] * 7),
+                            "observation.state": frame.get("state", [0.0] * 7),
+                        }
+                    )
                     global_frame += 1
             else:
                 # Generate synthetic frames for skills without trajectory data
                 num_frames = 10
                 for i in range(num_frames):
-                    rows.append({
-                        "timestamp": global_frame * 0.05,
-                        "frame_index": global_frame,
-                        "episode_index": episode_idx,
-                        "action": [0.0] * 7,
-                        "observation.state": [0.0] * 7,
-                    })
+                    rows.append(
+                        {
+                            "timestamp": global_frame * 0.05,
+                            "frame_index": global_frame,
+                            "episode_index": episode_idx,
+                            "action": [0.0] * 7,
+                            "observation.state": [0.0] * 7,
+                        }
+                    )
                     global_frame += 1
 
         df = pd.DataFrame(rows)
@@ -297,9 +306,11 @@ def compose(
                 ptype = key
                 break
 
-        skills.append(Skill(
-            skill_type=ptype,
-            description=instruction,
-        ))
+        skills.append(
+            Skill(
+                skill_type=ptype,
+                description=instruction,
+            )
+        )
 
     return ComposedTask(skills)

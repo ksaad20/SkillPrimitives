@@ -29,7 +29,11 @@ class Lift(Primitive):
         if len(gripper) < 3:
             return segments
 
-        vel = velocity if velocity is not None and velocity.size > 0 else self._compute_velocity(state or np.array([]))
+        vel = (
+            velocity
+            if velocity is not None and velocity.size > 0
+            else self._compute_velocity(state or np.array([]))
+        )
         if vel.size == 0 or vel.shape[1] < 3:
             return segments
 
@@ -48,12 +52,14 @@ class Lift(Primitive):
                 end = t
 
                 if end - start >= min_lift_frames:
-                    segments.append({
-                        "type": self.name,
-                        "start": int(start),
-                        "end": int(end),
-                        "confidence": 0.90,
-                    })
+                    segments.append(
+                        {
+                            "type": self.name,
+                            "start": int(start),
+                            "end": int(end),
+                            "confidence": 0.90,
+                        }
+                    )
             else:
                 t += 1
 

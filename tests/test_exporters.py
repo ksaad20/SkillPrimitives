@@ -35,6 +35,7 @@ class TestParquetExporter:
     def test_export_without_pyarrow_raises(self, tmp_path, monkeypatch):
         """Ensure graceful failure if pyarrow is missing."""
         import sys
+
         # Temporarily hide pandas/pyarrow
         modules_to_hide = ["pandas", "pyarrow"]
         for mod in modules_to_hide:
@@ -42,6 +43,7 @@ class TestParquetExporter:
 
         # Re-import to get fresh state
         from skill_primitives.io.exporters import ParquetExporter
+
         exp = ParquetExporter()
         out = tmp_path / "test.parquet"
         # Should raise ImportError when trying to import pandas
