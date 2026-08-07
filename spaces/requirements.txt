@@ -1,0 +1,9 @@
+# Skill Primitives Space dependencies
+# Install the package from the parent directory
+-e ..
+
+# Gradio for the web UI
+gradio>=4.0.0
+
+# Visualization
+matplotlib>=3.7.0
