@@ -251,7 +251,7 @@ class ROS2Exporter:
     ) -> Path:
 
         """Write joint-state CSV compatible with ROS2 JointState messages."""
-         csv_path = self.output_dir / f"{filename}_trajectory.csv"
+         csv_path = self.output_dir / "{filename}_trajectory.csv"
 
         header = ["time_sec"]
         if self.joint_names and len(self.joint_names) == states.shape[-1]:
