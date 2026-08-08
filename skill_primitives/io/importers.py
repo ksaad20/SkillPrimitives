@@ -1,10 +1,10 @@
-from typing import Any
-import numpy as np
 """Import trajectories from custom formats.
 
 Provides adapters for loading robot trajectory data from
 non-LeRobot sources (CSV, HDF5, ROS bags, etc.).
 """
+from typing import Any
+import numpy as np
 
 from __future__ import annotations
 
