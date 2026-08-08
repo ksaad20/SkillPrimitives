@@ -54,7 +54,7 @@ jobs:
         run: ruff check .
 
       - name: Check import sorting
-        run: isort --check-only --diff .
+        run: ruff check --select I --diff .
 
       - name: Type check with mypy
         run: mypy skill_primitives
