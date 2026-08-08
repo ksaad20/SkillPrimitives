@@ -1,9 +1,3 @@
-"""CLI: Run the 10-second hello demo.
-
-Usage:
-    python -m skill_primitives.demo
-"""
-
 from __future__ import annotations
 
 import json
@@ -15,7 +9,7 @@ from skill_primitives.core.composer import compose
 from skill_primitives.core.segmenter import segment_episode
 
 
-def main(argv=None) -> None:
+def main() -> None:
     print("=" * 60)
     print("  Skill Primitives — Hello Demo")
     print("  Natural Language to Robot Motion")
