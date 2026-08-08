@@ -221,7 +221,6 @@ skip_covered = false
 
 [[tool.mypy.overrides]]
 module = [
-    "skill_primitives.cli.compose",
     "skill_primitives.cli.segment",
     "skill_primitives.cli.annotate",
     "skill_primitives.cli.demo",
@@ -232,6 +231,11 @@ disable_error_code = ["no-untyped-def", "return-value", "func-returns-value"]
 [[tool.mypy.overrides]]
 module = [
     "skill_primitives.io.__init__",
-    "skill_primitives.cli.compose",
 ]
 disable_error_code = ["attr-defined"]
+
+[[tool.mypy.overrides]]
+module = [
+    "skill_primitives.cli.compose",
+]
+disable_error_code = ["no-untyped-def", "return-value", "func-returns-value", "attr-defined"]
