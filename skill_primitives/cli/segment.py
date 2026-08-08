@@ -1,20 +1,14 @@
-"""CLI: Segment LeRobot datasets into primitives.
-
-Usage:
-    python -m skill_primitives.segment --dataset lerobot/pusht --output ./skills/
-    python -m skill_primitives.segment --dataset lerobot/pusht --episodes 0 1 2 --output ./skills/
-"""
-
 from __future__ import annotations
-from skill_primitives.core.annotator import Annotator
-from skill_primitives.core.segmenter import segment_episode
-from skill_primitives.io.lerobot_adapter import LeRobotAdapter
-from typing import Any
 
 import argparse
 import json
 import sys
 from pathlib import Path
+from typing import Any
+
+from skill_primitives.core.annotator import Annotator
+from skill_primitives.core.segmenter import segment_episode
+from skill_primitives.io.lerobot_adapter import LeRobotAdapter
 
 
 def main(argv: Any = None) -> None:
