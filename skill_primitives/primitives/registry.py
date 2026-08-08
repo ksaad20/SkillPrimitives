@@ -6,6 +6,7 @@ from skill_primitives.primitives.lift import Lift  # noqa: F401
 from skill_primitives.primitives.place import Place  # noqa: F401
 from skill_primitives.primitives.reach import Reach  # noqa: F401
 from skill_primitives.primitives.transport import Transport  # noqa: F401
+
 # ---------------------------------------------------------------------------
 
 _PRIMITIVES: dict[str, type[Primitive]] = {}
