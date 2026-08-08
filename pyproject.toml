@@ -231,9 +231,8 @@ fail_under = 80
 show_missing = true
 skip_covered = false
 
-['type-abstract']
-
-[
+[[tool.mypy.overrides]]
+module = [
     "skill_primitives.cli.compose",
     "skill_primitives.cli.segment",
     "skill_primitives.cli.annotate",
@@ -242,9 +241,9 @@ skip_covered = false
 ]
 disable_error_code = ["no-untyped-def", "return-value", "func-returns-value"]
 
-[
+[[tool.mypy.overrides]]
+module = [
     "skill_primitives.io.__init__",
     "skill_primitives.cli.compose",
 ]
 disable_error_code = ["attr-defined"]
-
