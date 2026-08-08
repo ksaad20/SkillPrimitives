@@ -133,19 +133,7 @@ extend-exclude = '''
 '''
 
 # ── isort ────────────────────────────────────────────────────────────────────
-[tool.isort]
-profile = "black"
-line_length = 100
-known_first_party = ["skill_primitives"]
-skip = [
-    ".git",
-    ".venv",
-    "venv",
-    "build",
-    "dist",
-    "__pycache__",
-    "node_modules",
-]
+
 
 # ── Ruff ─────────────────────────────────────────────────────────────────────
 [tool.ruff]
