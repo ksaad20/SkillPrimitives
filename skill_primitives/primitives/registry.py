@@ -1,13 +1,11 @@
 from __future__ import annotations
 
-
+from skill_primitives.primitives.base import Primitive
 from skill_primitives.primitives.grasp import Grasp  # noqa: F401
 from skill_primitives.primitives.lift import Lift  # noqa: F401
 from skill_primitives.primitives.place import Place  # noqa: F401
 from skill_primitives.primitives.reach import Reach  # noqa: F401
 from skill_primitives.primitives.transport import Transport  # noqa: F401
-from skill_primitives.primitives.base import Primitive
-
 # ---------------------------------------------------------------------------
 
 _PRIMITIVES: dict[str, type[Primitive]] = {}
