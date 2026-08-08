@@ -1,12 +1,6 @@
-"""Import trajectories from custom formats.
-
-Provides adapters for loading robot trajectory data from
-non-LeRobot sources (CSV, HDF5, ROS bags, etc.).
-"""
+from __future__ import annotations
 from typing import Any
 import numpy as np
-
-from __future__ import annotations
 
 
 def import_csv(path: str, **kwargs) -> dict[str, Any]:
