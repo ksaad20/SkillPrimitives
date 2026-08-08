@@ -8,7 +8,15 @@ from __future__ import annotations
 
 import os
 from typing import Any
+from typing import TYPE_CHECKING
 
+if TYPE_CHECKING:
+    import ollama
+else:
+    try:
+        import ollama
+    except ImportError:
+        ollama = None  # type: ignore[assignment]
 
 class Annotator:
     """Annotate primitives with natural language descriptions.
