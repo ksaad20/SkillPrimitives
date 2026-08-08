@@ -2,7 +2,7 @@
 
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import numpy as np
 
@@ -14,14 +14,14 @@ class BaseExporter:
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
-    def export(self, primitives: List[Dict[str, Any]], path: str) -> None:
+    def export(self, primitives: list[dict[str, Any]], path: str) -> None:
         raise NotImplementedError
 
 
 class JSONExporter(BaseExporter):
     """Export primitives to JSON."""
 
-    def export(self, primitives: List[Dict[str, Any]], path: str) -> None:
+    def export(self, primitives: list[dict[str, Any]], path: str) -> None:
         full_path = self.output_dir / path
         with open(full_path, "w") as f:
             json.dump(primitives, f, indent=2)
@@ -31,7 +31,7 @@ class JSONExporter(BaseExporter):
 class ParquetExporter(BaseExporter):
     """Export primitives to Parquet via pandas."""
 
-    def export(self, primitives: List[Dict[str, Any]], path: str) -> None:
+    def export(self, primitives: list[dict[str, Any]], path: str) -> None:
         import pandas as pd
 
         full_path = self.output_dir / path
@@ -85,7 +85,7 @@ class LeRobotExporter(BaseExporter):
         self.fps = fps
         self.dt = 1.0 / fps
 
-    def _generate_action(self, ptype: str, frame: int, total: int) -> List[float]:
+    def _generate_action(self, ptype: str, frame: int, total: int) -> list[float]:
         """Generate a plausible action vector for a frame."""
         t = frame / max(total, 1)
         if ptype == "reach":
@@ -99,7 +99,7 @@ class LeRobotExporter(BaseExporter):
             return [0.2 * (1 - t), 0.2 * (1 - t), -0.1 * t, 0.0, 0.0, 0.0, 1.0 - t]
         return [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
-    def _generate_state(self, ptype: str, frame: int, total: int) -> List[float]:
+    def _generate_state(self, ptype: str, frame: int, total: int) -> list[float]:
         """Generate a plausible state vector for a frame."""
         t = frame / max(total, 1)
         base = [0.3 + 0.2 * t, -0.1 + 0.3 * t, 0.15 + 0.1 * np.sin(2 * np.pi * t)]
@@ -111,7 +111,7 @@ class LeRobotExporter(BaseExporter):
 
     def export(
         self,
-        primitives: List[Dict[str, Any]],
+        primitives: list[dict[str, Any]],
         path: str,
         episode_idx: int = 0,
     ) -> None:
@@ -143,7 +143,7 @@ class LeRobotExporter(BaseExporter):
         df.to_parquet(self.output_dir / path, index=False)
         print(f"Exported LeRobot format to {self.output_dir / path}")
 
-    def export_policy(self, primitives: List[Dict[str, Any]], path: str) -> None:
+    def export_policy(self, primitives: list[dict[str, Any]], path: str) -> None:
         """Export as a policy script."""
         lines = [
             "# Auto-generated policy from skill primitives",
@@ -156,7 +156,7 @@ class LeRobotExporter(BaseExporter):
 
         for i, p in enumerate(primitives):
             desc = p.get("description", p.get("type", "unknown"))
-            lines.append('        self.publish_skill({}, "{}")'.format(i, desc))
+            lines.append(f'        self.publish_skill({i}, "{desc}")')
 
         lines.extend(
             [

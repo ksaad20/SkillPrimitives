@@ -13,11 +13,10 @@ Usage:
 
 import argparse
 import json
-import os
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Optional
 
 from PIL import Image, ImageDraw, ImageFont
 from rich.console import Console
@@ -119,7 +118,7 @@ class TweetCard:
     def rounded_rect(
         self,
         draw: ImageDraw.Draw,
-        xy: Tuple[int, int, int, int],
+        xy: tuple[int, int, int, int],
         radius: int,
         fill: Optional[str] = None,
         outline: Optional[str] = None,
@@ -179,7 +178,7 @@ class TweetCard:
         self,
         title: str,
         subtitle: str,
-        metrics: List[Dict],
+        metrics: list[dict],
         footer: str,
         output_path: Path,
         logo_path: Optional[Path] = None,
@@ -265,9 +264,9 @@ class TweetCard:
 
 
 # ── Benchmark Parsing ────────────────────────────────────────────────────────
-def load_benchmark(path: Path) -> Dict:
+def load_benchmark(path: Path) -> dict:
     """Load benchmark results from JSON."""
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         return json.load(f)
 
 
@@ -285,7 +284,7 @@ def find_latest_benchmark() -> Path:
     return files[0]
 
 
-def extract_metrics(data: Dict) -> List[Dict]:
+def extract_metrics(data: dict) -> list[dict]:
     """Extract displayable metrics from benchmark data."""
     metrics = []
 

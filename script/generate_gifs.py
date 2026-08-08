@@ -13,14 +13,13 @@ Usage:
 
 import argparse
 import json
-import os
 import shutil
 import subprocess
 import sys
 import tempfile
 import time
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Optional
 
 from PIL import Image
 from rich.console import Console
@@ -54,7 +53,7 @@ class GIFGenerator:
         output_dir: Path,
         fps: int = DEFAULT_FPS,
         duration: int = DEFAULT_DURATION,
-        resolution: Tuple[int, int] = DEFAULT_RESOLUTION,
+        resolution: tuple[int, int] = DEFAULT_RESOLUTION,
     ):
         self.zoo_dir = zoo_dir
         self.output_dir = output_dir
@@ -65,7 +64,7 @@ class GIFGenerator:
         self.stats = {"generated": 0, "skipped": 0, "failed": 0, "optimized": 0}
 
     # ── Discovery ──────────────────────────────────────────────────────────────
-    def load_manifest(self) -> List[Dict]:
+    def load_manifest(self) -> list[dict]:
         """Load the zoo manifest for primitive metadata."""
         if not MANIFEST_FILE.exists():
             console.print(
@@ -74,11 +73,11 @@ class GIFGenerator:
             )
             sys.exit(1)
 
-        with open(MANIFEST_FILE, "r", encoding="utf-8") as f:
+        with open(MANIFEST_FILE, encoding="utf-8") as f:
             data = json.load(f)
         return data.get("primitives", [])
 
-    def discover_targets(self, primitive_name: Optional[str] = None) -> List[Dict]:
+    def discover_targets(self, primitive_name: Optional[str] = None) -> list[dict]:
         """Determine which primitives need GIF generation."""
         primitives = self.load_manifest()
 
@@ -91,7 +90,7 @@ class GIFGenerator:
         return primitives
 
     # ── Rendering ──────────────────────────────────────────────────────────────
-    def needs_generation(self, primitive: Dict) -> bool:
+    def needs_generation(self, primitive: dict) -> bool:
         """Check if GIF needs regeneration (missing or outdated)."""
         gif_path = self.output_dir / f"{primitive['name']}.gif"
         meta_path = self.zoo_dir / primitive["name"] / "meta.json"
@@ -107,7 +106,7 @@ class GIFGenerator:
 
         return False
 
-    def render_frames_playwright(self, html_path: Path, output_frames_dir: Path) -> List[Path]:
+    def render_frames_playwright(self, html_path: Path, output_frames_dir: Path) -> list[Path]:
         """Render frames using Playwright (recommended)."""
         try:
             from playwright.sync_api import sync_playwright
@@ -142,12 +141,11 @@ class GIFGenerator:
 
         return frame_paths
 
-    def render_frames_fallback(self, html_path: Path, output_frames_dir: Path) -> List[Path]:
+    def render_frames_fallback(self, html_path: Path, output_frames_dir: Path) -> list[Path]:
         """Fallback frame rendering using selenium if playwright unavailable."""
         try:
             from selenium import webdriver
             from selenium.webdriver.chrome.options import Options
-            from selenium.webdriver.chrome.service import Service
         except ImportError:
             console.print("[red]Neither Playwright nor Selenium available.[/red]")
             sys.exit(1)
@@ -172,7 +170,7 @@ class GIFGenerator:
         driver.quit()
         return frame_paths
 
-    def compile_gif(self, frame_paths: List[Path], output_path: Path) -> None:
+    def compile_gif(self, frame_paths: list[Path], output_path: Path) -> None:
         """Compile PNG frames into an optimized GIF."""
         images = [Image.open(f) for f in frame_paths]
 

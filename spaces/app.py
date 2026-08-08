@@ -9,14 +9,11 @@ from __future__ import annotations
 
 import json
 import tempfile
-from pathlib import Path
 
 import gradio as gr
-import numpy as np
 
-from skill_primitives import segment_episode, compose
+from skill_primitives import compose, segment_episode
 from skill_primitives.core.annotator import Annotator
-from skill_primitives.primitives.registry import list_primitives
 
 
 def segment_dataset(dataset_name: str, episode: int) -> tuple[str, str]:
@@ -103,9 +100,8 @@ def compose_task(instructions_text: str) -> tuple[str, str]:
         lines.append(f"| {i} | `{p['type']}` | {p['instruction']} |")
 
     # Generate JSON export
-    tmp = tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False)
-    task.export_json(tmp.name)
-    tmp.close()
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as tmp:
+        task.export_json(tmp.name)
 
     with open(tmp.name) as f:
         export_json = f.read()

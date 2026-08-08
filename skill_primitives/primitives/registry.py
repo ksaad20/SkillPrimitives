@@ -1,3 +1,14 @@
+from __future__ import annotations
+
+from typing import Any
+
+from skill_primitives.primitives.base import Primitive
+from skill_primitives.primitives.grasp import Grasp
+from skill_primitives.primitives.lift import Lift
+from skill_primitives.primitives.place import Place
+from skill_primitives.primitives.reach import Reach
+from skill_primitives.primitives.transport import Transport
+
 """Auto-discover and register all primitive classes.
 
 Provides a central registry for looking up primitive detectors by name.
@@ -5,22 +16,13 @@ Adding a new primitive is as simple as creating a new subclass of Primitive
 and importing it here.
 """
 
-from __future__ import annotations
 
-from typing import Type
-
-from skill_primitives.primitives.base import Primitive
-from skill_primitives.primitives.reach import Reach
-from skill_primitives.primitives.grasp import Grasp
-from skill_primitives.primitives.lift import Lift
-from skill_primitives.primitives.transport import Transport
-from skill_primitives.primitives.place import Place
 
 # ---------------------------------------------------------------------------
 # Registry
 # ---------------------------------------------------------------------------
 
-_PRIMITIVES: dict[str, Type[Primitive]] = {
+_PRIMITIVES: dict[str, type[Primitive]] = {
     cls.name: cls for cls in [Reach, Grasp, Lift, Transport, Place] if cls.name
 }
 
@@ -30,7 +32,7 @@ _PRIMITIVES: dict[str, Type[Primitive]] = {
 # ---------------------------------------------------------------------------
 
 
-def get_primitive(name: str) -> Type[Primitive]:
+def get_primitive(name: str) -> type[Primitive]:
     """Retrieve a primitive class by name.
 
     Args:
@@ -57,7 +59,7 @@ def list_primitives() -> list[str]:
     return sorted(_PRIMITIVES.keys())
 
 
-def get_all_primitives() -> dict[str, Type[Primitive]]:
+def get_all_primitives() -> dict[str, type[Primitive]]:
     """Return the full registry mapping.
 
     Returns:
@@ -66,7 +68,7 @@ def get_all_primitives() -> dict[str, Type[Primitive]]:
     return dict(_PRIMITIVES)
 
 
-def register_primitive(cls: Type[Primitive]) -> Type[Primitive]:
+def register_primitive(cls: type[Primitive]) -> type[Primitive]:
     """Decorator to register a new primitive class.
 
     Usage:

@@ -31,7 +31,7 @@ def main(argv=None):
         primitives = segment_episode("lerobot/pusht", episode=0)
         source = "live"
     except Exception as e:
-        print("      Note: Using synthetic fallback ({})".format(e))
+        print(f"      Note: Using synthetic fallback ({e})")
         primitives = [
             {"type": "reach", "start": 0, "end": 15, "confidence": 0.92},
             {"type": "grasp", "start": 15, "end": 25, "confidence": 0.88},
@@ -41,7 +41,7 @@ def main(argv=None):
         source = "synthetic"
 
     print("")
-    print("      Detected {} primitives ({})".format(len(primitives), source))
+    print(f"      Detected {len(primitives)} primitives ({source})")
     for p in primitives:
         line = "{:10s} | frames {:3d}-{:3d} | conf={:.2f}".format(
             p["type"], p["start"], p["end"], p["confidence"]
@@ -72,12 +72,12 @@ def main(argv=None):
 
     print("      Instructions:")
     for i, inst in enumerate(novel_instructions, 1):
-        print("        {}. {}".format(i, inst))
+        print(f"        {i}. {inst}")
 
     task = compose(novel_instructions)
 
     print("")
-    print("      Composed {} primitives:".format(len(task.primitives)))
+    print(f"      Composed {len(task.primitives)} primitives:")
     for i, p in enumerate(task.primitives, 1):
         print("        {}. [{:12s}] {}".format(i, p["type"], p["instruction"]))
 
@@ -85,15 +85,14 @@ def main(argv=None):
     print("")
     print("[4/4] Exporting composed task...")
 
-    tmp = tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False)
-    task.export_json(tmp.name)
-    tmp.close()
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as tmp:
+        task.export_json(tmp.name)
 
     # Show the exported content
     with open(tmp.name) as f:
         exported = json.load(f)
 
-    print("      Exported to: {}".format(tmp.name))
+    print(f"      Exported to: {tmp.name}")
     print("      Task duration: {:.1f}s".format(exported["task"]["estimated_duration"]))
     print("      Num primitives: {}".format(exported["task"]["num_primitives"]))
 

@@ -1,6 +1,5 @@
 """Tests for the trajectory segmenter."""
 
-import pytest
 
 from skill_primitives.core.segmenter import segment_episode
 

@@ -2,7 +2,7 @@
 
 import pytest
 
-from skill_primitives.core.composer import compose, SkillLibrary, ComposedTask
+from skill_primitives.core.composer import ComposedTask, SkillLibrary, compose
 
 
 class TestComposer:

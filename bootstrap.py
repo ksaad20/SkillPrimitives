@@ -5,15 +5,7 @@ Run: python bootstrap.py
 Then: git init && git add . && git commit -m "v0.1.0"
 """
 
-import os
-import shutil
-import re
-import json
-import argparse
 from pathlib import Path
-from typing import List, Dict, Any, Optional, Tuple
-from dataclasses import dataclass, asdict
-from datetime import datetime
 
 ROOT = Path(__file__).parent.resolve()
 

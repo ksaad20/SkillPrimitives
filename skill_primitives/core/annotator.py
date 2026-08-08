@@ -71,19 +71,19 @@ class Annotator:
                 import ollama
 
                 self._client = ollama
-            except ImportError:
+            except ImportError as err:
                 raise ImportError(
                     "Ollama not installed. Install with: pip install ollama "
                     "or use --provider groq/openai"
-                )
+                ) from err
 
         elif self.provider == "groq":
             try:
                 from groq import Groq
 
                 self._client = Groq(api_key=self.api_key)
-            except ImportError:
-                raise ImportError("Groq SDK not installed. Install with: pip install groq")
+            except ImportError as err:
+                raise ImportError("Groq SDK not installed. Install with: pip install groq") from err
 
         elif self.provider == "openai":
             try:
@@ -93,8 +93,8 @@ class Annotator:
                 if self.base_url:
                     kwargs["base_url"] = self.base_url
                 self._client = OpenAI(**kwargs)
-            except ImportError:
-                raise ImportError("OpenAI SDK not installed. Install with: pip install openai")
+            except ImportError as err:
+                raise ImportError("OpenAI SDK not installed. Install with: pip install openai") from err
 
         else:
             raise ValueError(
@@ -151,16 +151,7 @@ Command:"""
             )
             return response["message"]["content"].strip()
 
-        elif self.provider == "groq":
-            response = client.chat.completions.create(
-                model=self.model,
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0.3,
-                max_tokens=30,
-            )
-            return response.choices[0].message.content.strip()
-
-        elif self.provider == "openai":
+        elif self.provider == "groq" or self.provider == "openai":
             response = client.chat.completions.create(
                 model=self.model,
                 messages=[{"role": "user", "content": prompt}],
@@ -210,7 +201,7 @@ Command:"""
             List of primitive dicts with added "description" key.
         """
         annotated = []
-        for i, primitive in enumerate(primitives):
+        for _i, primitive in enumerate(primitives):
             desc = self.annotate(primitive)
             annotated_primitive = dict(primitive)
             annotated_primitive["description"] = desc

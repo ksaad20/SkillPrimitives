@@ -6,7 +6,6 @@ non-LeRobot sources (CSV, HDF5, ROS bags, etc.).
 
 from __future__ import annotations
 
-from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -113,8 +112,8 @@ def import_hdf5(path: str, dataset_key: str = "trajectory") -> dict[str, Any]:
     """
     try:
         import h5py
-    except ImportError:
-        raise ImportError("h5py is required for HDF5 import. " "Install with: pip install h5py")
+    except ImportError as err:
+        raise ImportError("h5py is required for HDF5 import. " "Install with: pip install h5py") from err
 
     with h5py.File(path, "r") as f:
         if dataset_key not in f:

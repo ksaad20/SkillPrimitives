@@ -10,8 +10,6 @@ import json
 from pathlib import Path
 from typing import Any
 
-import numpy as np
-
 
 class Skill:
     """A single skill primitive loaded from the skill library."""
@@ -56,7 +54,7 @@ class SkillLibrary:
             self._by_type.setdefault(skill.skill_type, []).append(skill)
 
     @classmethod
-    def from_disk(cls, path: str) -> "SkillLibrary":
+    def from_disk(cls, path: str) -> SkillLibrary:
         """Load a skill library from a directory structure.
 
         Args:
@@ -230,10 +228,10 @@ class ComposedTask:
         """
         try:
             import pandas as pd
-        except ImportError:
+        except ImportError as err:
             raise ImportError(
                 "pandas is required for LeRobot export. " "Install with: pip install pandas"
-            )
+            ) from err
 
         rows = []
         global_frame = 0
@@ -243,7 +241,7 @@ class ComposedTask:
             # If skill has trajectory data, use it
             if skill.trajectory and "data" in skill.trajectory:
                 traj_data = skill.trajectory["data"]
-                for i, frame in enumerate(traj_data):
+                for _i, frame in enumerate(traj_data):
                     rows.append(
                         {
                             "timestamp": global_frame * 0.05,
@@ -257,7 +255,7 @@ class ComposedTask:
             else:
                 # Generate synthetic frames for skills without trajectory data
                 num_frames = 10
-                for i in range(num_frames):
+                for _i in range(num_frames):
                     rows.append(
                         {
                             "timestamp": global_frame * 0.05,

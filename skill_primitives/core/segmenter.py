@@ -8,11 +8,8 @@ and end-effector motion heuristics.
 from __future__ import annotations
 
 from typing import Any
-from pathlib import Path
 
 import numpy as np
-
-from skill_primitives.primitives.registry import list_primitives, get_primitive
 
 
 def load_lerobot_episode(dataset_name: str, episode: int = 0) -> dict[str, Any]:
@@ -27,11 +24,11 @@ def load_lerobot_episode(dataset_name: str, episode: int = 0) -> dict[str, Any]:
     """
     try:
         from datasets import load_dataset
-    except ImportError:
+    except ImportError as err:
         raise ImportError(
             "The 'datasets' library is required to load LeRobot datasets. "
             "Install it with: pip install datasets"
-        )
+        ) from err
 
     ds = load_dataset(
         dataset_name, split="train", streaming=False, revision="main"
@@ -285,10 +282,7 @@ def detect_lift_segments(
         lift_start = search_start + int(np.argmax(positive_z))
         # Find where z-velocity drops back down
         negative_after = np.where(z_vel[int(np.argmax(positive_z)) :] <= 0.01)[0]
-        if len(negative_after) > 0:
-            lift_end = lift_start + int(negative_after[0])
-        else:
-            lift_end = search_end
+        lift_end = lift_start + int(negative_after[0]) if len(negative_after) > 0 else search_end
 
         # Verify gripper is closed
         if np.mean(gripper[lift_start:lift_end]) < 0.6:

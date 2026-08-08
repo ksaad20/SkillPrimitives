@@ -57,7 +57,7 @@ def main(argv=None):
     if args.instructions_file:
         path = Path(args.instructions_file)
         if not path.exists():
-            print("Error: Instructions file not found: {}".format(path))
+            print(f"Error: Instructions file not found: {path}")
             return 1
         instructions = [line.strip() for line in path.read_text().splitlines() if line.strip()]
     elif args.instructions:
@@ -66,19 +66,19 @@ def main(argv=None):
         print("Error: Provide --instructions or --instructions-file")
         return 1
 
-    print("Loading skill library from: {}".format(args.library))
+    print(f"Loading skill library from: {args.library}")
     lib = SkillLibrary.from_disk(args.library)
 
-    print("Composing task from {} instructions:".format(len(instructions)))
+    print(f"Composing task from {len(instructions)} instructions:")
     for i, inst in enumerate(instructions, 1):
-        print("  {}. {}".format(i, inst))
+        print(f"  {i}. {inst}")
 
     task = compose(instructions, library=lib)
 
     print("")
-    print("Composed {} skills:".format(len(task.skills)))
+    print(f"Composed {len(task.skills)} skills:")
     for i, skill in enumerate(task.skills, 1):
-        print("  {}. [{}] {}".format(i, skill.skill_type, skill.description))
+        print(f"  {i}. [{skill.skill_type}] {skill.description}")
 
     # Export
     output_path = Path(args.output)
@@ -97,8 +97,8 @@ def main(argv=None):
 
     print("")
     print("{}".format("=" * 50))
-    print("Task exported to: {}".format(output_path.absolute()))
-    print("Format: {}".format(args.format))
+    print(f"Task exported to: {output_path.absolute()}")
+    print(f"Format: {args.format}")
     print("{}".format("=" * 50))
 
     return 0

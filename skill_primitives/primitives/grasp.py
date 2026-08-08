@@ -37,10 +37,7 @@ class Grasp(Primitive):
 
                 # Verify: gripper should be mostly closed after transition
                 post_closure = gripper[t : min(t + 5, len(gripper))]
-                if len(post_closure) > 0 and np.mean(post_closure) < 0.6:
-                    confidence = 0.92
-                else:
-                    confidence = 0.75
+                confidence = 0.92 if len(post_closure) > 0 and np.mean(post_closure) < 0.6 else 0.75
 
                 segments.append(
                     {

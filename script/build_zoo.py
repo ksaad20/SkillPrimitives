@@ -13,12 +13,11 @@ Usage:
 
 import argparse
 import json
-import os
 import shutil
 import sys
 import time
 from pathlib import Path
-from typing import Dict, List, Optional, Set
+from typing import Optional
 
 import yaml
 from jinja2 import Environment, FileSystemLoader, select_autoescape
@@ -48,12 +47,12 @@ class ZooBuilder:
             loader=FileSystemLoader(str(templates_dir)),
             autoescape=select_autoescape(["html", "xml"]),
         )
-        self.manifest: Dict = {"generated_at": None, "primitives": []}
-        self.errors: List[str] = []
-        self.warnings: List[str] = []
+        self.manifest: dict = {"generated_at": None, "primitives": []}
+        self.errors: list[str] = []
+        self.warnings: list[str] = []
 
     # ── Discovery ──────────────────────────────────────────────────────────────
-    def discover_primitives(self, names: Optional[Set[str]] = None) -> List[Path]:
+    def discover_primitives(self, names: Optional[set[str]] = None) -> list[Path]:
         """Find all primitive directories."""
         if not self.primitives_dir.exists():
             console.print(f"[red]Primitives directory not found: {self.primitives_dir}[/red]")
@@ -71,7 +70,7 @@ class ZooBuilder:
         return sorted(candidates)
 
     # ── Validation ─────────────────────────────────────────────────────────────
-    def validate_primitive(self, primitive_dir: Path) -> Optional[Dict]:
+    def validate_primitive(self, primitive_dir: Path) -> Optional[dict]:
         """Validate a primitive directory structure and metadata."""
         name = primitive_dir.name
         spec_path = primitive_dir / "spec.yaml"
@@ -81,7 +80,7 @@ class ZooBuilder:
             return None
 
         try:
-            with open(spec_path, "r", encoding="utf-8") as f:
+            with open(spec_path, encoding="utf-8") as f:
                 spec = yaml.safe_load(f)
         except yaml.YAMLError as e:
             self.errors.append(f"{name}: Invalid YAML in spec.yaml — {e}")
@@ -105,7 +104,7 @@ class ZooBuilder:
         return spec
 
     # ── Build ──────────────────────────────────────────────────────────────────
-    def build_primitive(self, primitive_dir: Path, spec: Dict) -> Dict:
+    def build_primitive(self, primitive_dir: Path, spec: dict) -> dict:
         """Build a single primitive into the zoo."""
         name = primitive_dir.name
         output_dir = self.zoo_dir / name
@@ -148,7 +147,7 @@ class ZooBuilder:
         return meta
 
     # ── Orchestration ──────────────────────────────────────────────────────────
-    def build(self, names: Optional[Set[str]] = None) -> bool:
+    def build(self, names: Optional[set[str]] = None) -> bool:
         """Run the full build process."""
         console.rule("[bold blue]🦁 Zoo Builder[/bold blue]")
 
@@ -212,8 +211,8 @@ class ZooBuilder:
     def watch(self):
         """Watch primitives/ for changes and rebuild."""
         try:
-            from watchdog.observers import Observer
             from watchdog.events import FileSystemEventHandler
+            from watchdog.observers import Observer
         except ImportError:
             console.print("[red]watchdog required for --watch. Run: pip install watchdog[/red]")
             sys.exit(1)

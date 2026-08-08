@@ -12,8 +12,6 @@ import json
 import sys
 from pathlib import Path
 
-import numpy as np
-
 from skill_primitives.core.annotator import Annotator
 from skill_primitives.core.segmenter import segment_episode
 from skill_primitives.io.lerobot_adapter import LeRobotAdapter
@@ -81,9 +79,9 @@ def main(argv=None):
         try:
             adapter = LeRobotAdapter()
             episodes = adapter.list_episodes(args.dataset)
-            print("Found {} episodes in {}".format(len(episodes), args.dataset))
+            print(f"Found {len(episodes)} episodes in {args.dataset}")
         except Exception as e:
-            print("Could not list episodes: {}".format(e))
+            print(f"Could not list episodes: {e}")
             print("Falling back to episode 0 only")
             episodes = [0]
 
@@ -95,15 +93,15 @@ def main(argv=None):
 
     for ep_idx in episodes:
         print("")
-        print("Processing episode {}...".format(ep_idx))
+        print(f"Processing episode {ep_idx}...")
 
         try:
             primitives = segment_episode(args.dataset, episode=ep_idx)
         except Exception as e:
-            print("  Failed to segment episode {}: {}".format(ep_idx, e))
+            print(f"  Failed to segment episode {ep_idx}: {e}")
             continue
 
-        print("  Found {} primitives".format(len(primitives)))
+        print(f"  Found {len(primitives)} primitives")
 
         # Annotate if requested
         if annotator:
@@ -116,7 +114,7 @@ def main(argv=None):
             pdir.mkdir(exist_ok=True)
 
             # Write metadata
-            meta_path = pdir / "episode_{:03d}_seg_{:03d}.json".format(ep_idx, i)
+            meta_path = pdir / f"episode_{ep_idx:03d}_seg_{i:03d}.json"
             with open(meta_path, "w") as f:
                 json.dump(primitive, f, indent=2)
 
@@ -125,10 +123,10 @@ def main(argv=None):
     print("")
     print("{}".format("=" * 50))
     print("Segmentation complete!")
-    print("  Dataset: {}".format(args.dataset))
-    print("  Episodes: {}".format(len(episodes)))
-    print("  Total segments: {}".format(total_segments))
-    print("  Output: {}".format(out_dir.absolute()))
+    print(f"  Dataset: {args.dataset}")
+    print(f"  Episodes: {len(episodes)}")
+    print(f"  Total segments: {total_segments}")
+    print(f"  Output: {out_dir.absolute()}")
     print("{}".format("=" * 50))
 
     return 0

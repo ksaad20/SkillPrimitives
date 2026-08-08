@@ -19,19 +19,18 @@ Usage:
 
 import argparse
 import json
-import os
 import re
+import shutil
 import subprocess
 import sys
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Optional
 
 import yaml
 from rich.console import Console
 from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.table import Table
-from rich.text import Text
 
 console = Console()
 
@@ -75,7 +74,7 @@ class ReleaseChecklist:
     def __init__(self, project_root: Path, target_version: Optional[str] = None):
         self.project_root = project_root
         self.target_version = target_version
-        self.results: List[CheckResult] = []
+        self.results: list[CheckResult] = []
         self.fix_mode = False
 
     # ── Individual Checks ──────────────────────────────────────────────────────
@@ -137,12 +136,12 @@ class ReleaseChecklist:
                 versions["pyproject.toml"] = m.group(1)
 
         if PACKAGE_JSON.exists():
-            with open(PACKAGE_JSON, "r", encoding="utf-8") as f:
+            with open(PACKAGE_JSON, encoding="utf-8") as f:
                 data = json.load(f)
                 versions["package.json"] = data.get("version", "N/A")
 
         if MANIFEST.exists():
-            with open(MANIFEST, "r", encoding="utf-8") as f:
+            with open(MANIFEST, encoding="utf-8") as f:
                 data = json.load(f)
                 # Manifest doesn't typically store top-level version
                 pass
@@ -295,7 +294,7 @@ class ReleaseChecklist:
                 continue
 
             try:
-                with open(spec_path, "r", encoding="utf-8") as f:
+                with open(spec_path, encoding="utf-8") as f:
                     spec = yaml.safe_load(f)
             except yaml.YAMLError as e:
                 errors.append(f"{primitive_dir.name}: Invalid YAML — {e}")
