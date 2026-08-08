@@ -36,9 +36,7 @@ def get_primitive(name: str) -> type[Primitive]:
     """
     if name not in _PRIMITIVES:
         available = ", ".join(sorted(_PRIMITIVES.keys()))
-        raise KeyError(
-            "Unknown primitive: '" + name + "'. Available primitives: " + available
-        )
+        raise KeyError("Unknown primitive: '" + name + "'. Available primitives: " + available)
     return _PRIMITIVES[name]
 
 
@@ -73,8 +71,6 @@ def register_primitive(cls: type[Primitive]) -> type[Primitive]:
         ValueError: If the class lacks a ``name`` attribute.
     """
     if not cls.name:
-        raise ValueError(
-            "Primitive class " + cls.__name__ + " must have a 'name' attribute"
-        )
+        raise ValueError("Primitive class " + cls.__name__ + " must have a 'name' attribute")
     _PRIMITIVES[cls.name] = cls
     return cls
