@@ -169,7 +169,9 @@ class LeRobotExporter(BaseExporter):
         full_path.write_text("\n".join(lines), encoding="utf-8")
         print(f"Exported policy to {full_path}")
 
+
 """ROS2 trajectory exporter."""
+
 
 class ROS2Exporter:
     """Export robot trajectories to ROS2-compatible CSV + YAML.
@@ -231,12 +233,6 @@ class ROS2Exporter:
 
     def _extract_states(self, trajectory: dict[str, Any]) -> np.ndarray:
         """Extract state array from trajectory dict."""
-        for key in ("states", "actions", "observations", "state"):
-            if key in trajectory:
-                value = trajectory[key]
-                if isinstance(value, np.ndarray):
-                    return value
-                return np.asarray(value)
         raise ValueError(
             "Trajectory must contain one of: states, actions, observations, state"
         )
@@ -251,11 +247,11 @@ class ROS2Exporter:
         # Default: assume 30 Hz
         return np.arange(num_frames) / 30.0
 
-    def _write_csv(
-        self, filename: str, timestamps: np.ndarray, states: np.ndarray
+    def _write_csv(self, filename: str, timestamps: np.ndarray, states: np.ndarray
     ) -> Path:
+
         """Write joint-state CSV compatible with ROS2 JointState messages."""
-        csv_path = self.output_dir / f"{filename}_trajectory.csv"
+         csv_path = self.output_dir / f"{filename}_trajectory.csv"
 
         header = ["time_sec"]
         if self.joint_names and len(self.joint_names) == states.shape[-1]:
