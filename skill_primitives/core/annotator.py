@@ -16,7 +16,7 @@ else:
     try:
         import ollama
     except ImportError:
-        ollama = None  # type: ignore[assignment]
+        ollama = None  
 
 
 class Annotator:
