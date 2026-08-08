@@ -79,9 +79,7 @@ class ROS2Exporter(Exporter):
             if key in trajectory:
                 value = trajectory[key]
                 return value if isinstance(value, np.ndarray) else np.asarray(value)
-        raise ValueError(
-            "Trajectory must contain one of: states, actions, observations, state"
-        )
+        raise ValueError("Trajectory must contain one of: states, actions, observations, state")
 
     def _extract_timestamps(self, trajectory: dict[str, Any], num_frames: int) -> np.ndarray:
         if "timestamps" in trajectory:
