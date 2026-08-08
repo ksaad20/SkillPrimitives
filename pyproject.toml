@@ -38,7 +38,6 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Typing :: Typed",
 ]
-
 dependencies = [
     "numpy>=1.23.0",
     "pandas>=2.0.0",
@@ -74,6 +73,7 @@ dev = [
     "ruff>=0.0.280",
     "mypy>=1.5.0",
     "pre-commit>=3.3.0",
+    "types-PyYAML",
 ]
 paper = [
     "jupyter>=1.0.0",
@@ -132,9 +132,6 @@ extend-exclude = '''
 )/
 '''
 
-# ── isort ────────────────────────────────────────────────────────────────────
-
-
 # ── Ruff ─────────────────────────────────────────────────────────────────────
 [tool.ruff]
 line-length = 100
@@ -177,13 +174,14 @@ check_untyped_defs = true
 disallow_untyped_decorators = false
 no_implicit_optional = true
 warn_redundant_casts = true
-warn_unused_ignores = false
+warn_unused_ignores = true
 warn_no_return = true
 warn_unreachable = true
 strict_equality = true
 show_error_codes = true
-
 ignore_missing_imports = true
+
+# ── pytest ───────────────────────────────────────────────────────────────────
 [tool.pytest.ini_options]
 minversion = "7.0"
 testpaths = ["tests"]
@@ -212,39 +210,9 @@ exclude_lines = [
     "def __repr__",
     "raise AssertionError",
     "raise NotImplementedError",
-    "if __name__ == .__main__.:",
+    "if __name__ == .__main_.:",
     "if TYPE_CHECKING:",
 ]
 fail_under = 80
 show_missing = true
 skip_covered = false
-
-[[tool.mypy.overrides]]
-module = [
-    "skill_primitives.core.validator",
-    "skill_primitives.io",
-    "skill_primitives.io.*",
-    "skill_primitives.primitives.registry",
-]
-ignore_errors = true
-disable_error_code = ["no-untyped-def", "return-value", "func-returns-value"]
-
-[[tool.mypy.overrides]]
-module = [
-    "skill_primitives.core.validator",
-    "skill_primitives.io",
-    "skill_primitives.io.*",
-    "skill_primitives.primitives.registry",
-]
-ignore_errors = true
-disable_error_code = ["attr-defined"]
-
-[[tool.mypy.overrides]]
-module = [
-    "skill_primitives.core.validator",
-    "skill_primitives.io",
-    "skill_primitives.io.*",
-    "skill_primitives.primitives.registry",
-]
-ignore_errors = true
-disable_error_code = ["no-untyped-def", "return-value", "func-returns-value", "attr-defined"]
