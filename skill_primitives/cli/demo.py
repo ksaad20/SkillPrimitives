@@ -43,7 +43,9 @@ def main(argv=None):
     print("")
     print("      Detected {} primitives ({})".format(len(primitives), source))
     for p in primitives:
-        line = "        {:10s} | frames {:3d}-{:3d} | conf={:.2f}".format(p["type"], p["start"], p["end"], p["confidence"])
+                line = "        {:10s} | frames {:3d}-{:3d} | conf={:.2f}".format(
+            p["type"], p["start"], p["end"], p["confidence"]
+        )
         print(line)
 
     # Step 2: Annotate
