@@ -113,7 +113,7 @@ include = [
 # ── Black ────────────────────────────────────────────────────────────────────
 [tool.black]
 line-length = 100
-target-version = ["Python 3.11"]
+target-version = ["py311"]
 include = '\.pyi?$'
 extend-exclude = '''
 /(
