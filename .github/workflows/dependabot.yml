@@ -3,62 +3,59 @@
 
 version: 2
 updates:
-  # Python dependencies (pip)
-  - package-ecosystem: "pip"
-    directory: "/"
+  - package-ecosystem: pip
+    directory: /
     schedule:
-      interval: "weekly"
-      day: "monday"
+      interval: weekly
+      day: monday
       time: "09:00"
     open-pull-requests-limit: 10
     reviewers:
-      - "your-github-username"    # ← Replace with your handle
+      - ksaad20
     assignees:
-      - "your-github-username"
+      - ksaad20
     labels:
-      - "dependencies"
-      - "python"
+      - dependencies
+      - python
     commit-message:
-      prefix: "deps"
-      include: "scope"
-    # Group minor/patch updates to reduce PR noise
+      prefix: deps
+      include: scope
     groups:
       dev-dependencies:
         patterns:
-          - "pytest*"
-          - "black"
-          - "ruff"
-          - "mypy"
-          - "isort"
+          - pytest*
+          - black
+          - ruff
+          - mypy
+          - isort
         update-types:
-          - "minor"
-          - "patch"
+          - minor
+          - patch
       runtime-dependencies:
         patterns:
           - "*"
         exclude-patterns:
-          - "pytest*"
-          - "black"
-          - "ruff"
-          - "mypy"
-          - "isort"
+          - pytest*
+          - black
+          - ruff
+          - mypy
+          - isort
         update-types:
-          - "minor"
-          - "patch"
+          - minor
+          - patch
 
-  # GitHub Actions
-  - package-ecosystem: "github-actions"
-    directory: "/"
+  - package-ecosystem: github-actions
+    directory: /
     schedule:
-      interval: "weekly"
-      day: "monday"
+      interval: weekly
+      day: monday
       time: "09:00"
     open-pull-requests-limit: 5
     reviewers:
-      - "your-github-username"
+      - ksaad20
     labels:
-      - "dependencies"
-      - "github-actions"
+      - dependencies
+      - github-actions
     commit-message:
-      prefix: "ci"
-      include: "scope"
+      prefix: ci
+      include: scope
