@@ -43,7 +43,7 @@ def main(argv=None):
     print("")
     print("      Detected {} primitives ({})".format(len(primitives), source))
     for p in primitives:
-                line = "        {:10s} | frames {:3d}-{:3d} | conf={:.2f}".format(
+        line = "{:10s} | frames {:3d}-{:3d} | conf={:.2f}".format(
             p["type"], p["start"], p["end"], p["confidence"]
         )
         print(line)
@@ -102,7 +102,9 @@ def main(argv=None):
     print("  Demo complete!")
     print("  Try it yourself:")
     print("    python -m skill_primitives.segment --dataset lerobot/pusht --output ./skills/")
-    print("    python -m skill_primitives.compose --library ./skills/ --instructions \"reach\" \"grasp\" \"lift\"")
+    print(
+        '    python -m skill_primitives.compose --library ./skills/ --instructions "reach" "grasp" "lift"'
+    )
     print("=" * 60)
 
     return 0

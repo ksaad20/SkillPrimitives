@@ -119,9 +119,7 @@ class ReleaseChecklist:
                     f"No entry for version {self.target_version} in CHANGELOG.md",
                     fixable=True,
                 )
-            return CheckResult(
-                "CHANGELOG Updated", True, f"Found entry for {self.target_version}"
-            )
+            return CheckResult("CHANGELOG Updated", True, f"Found entry for {self.target_version}")
 
         # If no target version, just check it has recent content
         if "## " not in content:
@@ -171,9 +169,7 @@ class ReleaseChecklist:
                 fixable=True,
             )
 
-        return CheckResult(
-            "Version Consistency", True, f"All files at version {detected}"
-        )
+        return CheckResult("Version Consistency", True, f"All files at version {detected}")
 
     def check_tests_pass(self) -> CheckResult:
         """Run test suite and verify all tests pass."""
@@ -181,7 +177,10 @@ class ReleaseChecklist:
             return CheckResult("Tests Pass", True, "No tests directory found — skipped")
 
         # Try pytest first, then unittest
-        for cmd, name in [(["pytest", "-q"], "pytest"), (["python", "-m", "pytest", "-q"], "python -m pytest")]:
+        for cmd, name in [
+            (["pytest", "-q"], "pytest"),
+            (["python", "-m", "pytest", "-q"], "python -m pytest"),
+        ]:
             if shutil.which(cmd[0]):
                 result = subprocess.run(
                     cmd,
@@ -214,7 +213,17 @@ class ReleaseChecklist:
             for file_path in scan_dir.rglob("*"):
                 if not file_path.is_file():
                     continue
-                if file_path.suffix not in {".js", ".ts", ".py", ".yaml", ".yml", ".json", ".html", ".css", ".sh"}:
+                if file_path.suffix not in {
+                    ".js",
+                    ".ts",
+                    ".py",
+                    ".yaml",
+                    ".yml",
+                    ".json",
+                    ".html",
+                    ".css",
+                    ".sh",
+                }:
                     continue
 
                 try:

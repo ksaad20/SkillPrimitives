@@ -37,9 +37,7 @@ class ParquetExporter(BaseExporter):
         full_path = self.output_dir / path
 
         if not primitives:
-            df = pd.DataFrame(
-                columns=["type", "start", "end", "confidence", "description"]
-            )
+            df = pd.DataFrame(columns=["type", "start", "end", "confidence", "description"])
         else:
             records = []
             for p in primitives:

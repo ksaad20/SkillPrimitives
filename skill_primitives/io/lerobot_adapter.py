@@ -42,9 +42,9 @@ class LeRobotAdapter(BaseAdapter):
                 "The 'datasets' library is required. " "Install with: pip install datasets"
             )
 
-                ds = load_dataset(
-            dataset_path, split="train", streaming=False, revision="main"
-        )  # nosec B615 - intentionally tracking main branch for latest data
+            ds = load_dataset(
+                dataset_path, split="train", streaming=False, revision="main"
+            )  # nosec B615 - intentionally tracking main branch for latest data
 
         # Filter to specific episode
         if "episode_index" in ds.column_names:
@@ -146,8 +146,8 @@ class LeRobotAdapter(BaseAdapter):
             )
 
         ds = load_dataset(
-    dataset_path, split="train", streaming=False, revision="main"
-)  # nosec B615 - intentionally tracking main branch for latest data
+            dataset_path, split="train", streaming=False, revision="main"
+        )  # nosec B615 - intentionally tracking main branch for latest data
 
         if "episode_index" in ds.column_names:
             episodes = sorted(set(ds["episode_index"]))
