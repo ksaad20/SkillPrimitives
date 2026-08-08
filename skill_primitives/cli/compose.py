@@ -1,18 +1,12 @@
-"""CLI: Compose primitives into task sequences.
-
-Usage:
-    python -m skill_primitives.compose --library ./my_skills/ --instructions "reach" "grasp" "lift" "place"
-    python -m skill_primitives.compose --library ./my_skills/ --instructions-file task.txt --output task.json
-"""
-
 from __future__ import annotations
-from skill_primitives.core.composer import SkillLibrary, compose
-from skill_primitives.io.exporters import get_exporter
-from typing import Any
 
 import argparse
 import sys
 from pathlib import Path
+from typing import Any
+
+from skill_primitives.core.composer import SkillLibrary, compose
+from skill_primitives.io.exporters import get_exporter
 
 
 def main(argv: Any = None) -> None:
