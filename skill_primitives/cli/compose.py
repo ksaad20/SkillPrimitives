@@ -78,7 +78,9 @@ def main(argv: Any = None) -> None:
     output_path = Path(args.output)
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    exporter = get_exporter(args.format)
+    exporter_cls = get_exporter("json")
+    exporter = exporter_cls(output_dir="output")
+    path = exporter.export(trajectory, "output")
 
     # Prepare task dict for exporter
     task_dict = {
