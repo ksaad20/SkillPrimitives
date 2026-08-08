@@ -247,9 +247,10 @@ class ROS2Exporter:
         # Default: assume 30 Hz
         return np.arange(num_frames) / 30.0
 
-    def _write_csv(self, filename: str, timestamps: np.ndarray, states: np.ndarray
+    def _write_csv(
+        self, filename: str, timestamps: 
+ np.ndarray, states: np.ndarray
     ) -> Path:
-
         csv_path = self.output_dir / (filename + "_trajectory.csv")
         yaml_path = self.output_dir / (filename + "_metadata.yaml")
 
