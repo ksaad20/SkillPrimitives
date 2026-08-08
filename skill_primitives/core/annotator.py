@@ -1,12 +1,7 @@
-"""LLM-based natural language annotation of skill primitives.
-
-Annotates segmented primitives with natural language descriptions
-using local or API-based language models.
-"""
-
 from __future__ import annotations
 
 import os
+from typing import cast
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
@@ -159,7 +154,7 @@ Command:"""
                 messages=[{"role": "user", "content": prompt}],
                 options={"temperature": 0.3, "num_predict": 30},
             )
-            return response["message"]["content"].strip()
+            return cast(str, response.choices[0].message.content)
 
         elif self.provider == "groq" or self.provider == "openai":
             response = client.chat.completions.create(
