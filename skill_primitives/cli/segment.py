@@ -6,16 +6,15 @@ Usage:
 """
 
 from __future__ import annotations
+from skill_primitives.core.annotator import Annotator
+from skill_primitives.core.segmenter import segment_episode
+from skill_primitives.io.lerobot_adapter import LeRobotAdapter
+from typing import Any
 
 import argparse
 import json
 import sys
 from pathlib import Path
-
-from skill_primitives.core.annotator import Annotator
-from skill_primitives.core.segmenter import segment_episode
-from skill_primitives.io.lerobot_adapter import LeRobotAdapter
-from typing import Any
 
 
 def main(argv: Any = None) -> None:
