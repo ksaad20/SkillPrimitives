@@ -1,3 +1,4 @@
+from typing import Any
 import numpy as np
 """Import trajectories from custom formats.
 
@@ -6,7 +7,6 @@ non-LeRobot sources (CSV, HDF5, ROS bags, etc.).
 """
 
 from __future__ import annotations
-from typing import Any
 
 
 def import_csv(path: str, **kwargs) -> dict[str, Any]:
