@@ -15,8 +15,8 @@ if TYPE_CHECKING:
 else:
     try:
         import ollama
-    except ImportError:
-        ollama = None  
+        except ImportError:
+        ollama = None
 
 
 class Annotator:
