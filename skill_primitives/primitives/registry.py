@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Type
 
 from skill_primitives.primitives.base import Primitive
 from skill_primitives.primitives.grasp import Grasp
@@ -21,10 +21,7 @@ and importing it here.
 # Registry
 # ---------------------------------------------------------------------------
 
-_PRIMITIVES: dict[str, type[Primitive]] = {  # type: ignore[type-abstract]
-    cls.name: cls for cls in [Reach, Grasp, Lift, Transport, Place] if cls.name
-}
-
+_registry: dict[str, Type[Primitive]] = {}
 
 # ---------------------------------------------------------------------------
 # Public API
