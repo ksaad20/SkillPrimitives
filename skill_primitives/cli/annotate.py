@@ -6,14 +6,13 @@ Usage:
 """
 
 from __future__ import annotations
+from skill_primitives.core.annotator import Annotator
+from typing import Any
 
 import argparse
 import json
 import sys
 from pathlib import Path
-
-from skill_primitives.core.annotator import Annotator
-from typing import Any
 
 
 def main(argv: Any = None) -> None:
