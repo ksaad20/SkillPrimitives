@@ -18,6 +18,7 @@ else:
     except ImportError:
         ollama = None  # type: ignore[assignment]
 
+
 class Annotator:
     """Annotate primitives with natural language descriptions.
 
