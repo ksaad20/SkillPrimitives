@@ -56,7 +56,7 @@ SECRETS_PATTERNS = [
 
 DEBUG_PATTERNS = [
     (r"console\.log\(", "JavaScript console.log"),
-    (r"print\(["']DEBUG", "Python debug print"),
+    (r'print\(["\']DEBUG', "Python debug print"),
     (r"debugger;", "JavaScript debugger"),
     (r"TODO\s*[:\-]?\s*fixme", "TODO/FIXME marker"),
     (r"XXX", "XXX marker"),
