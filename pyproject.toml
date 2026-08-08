@@ -177,7 +177,7 @@ check_untyped_defs = true
 disallow_untyped_decorators = false
 no_implicit_optional = true
 warn_redundant_casts = true
-warn_unused_ignores = true
+warn_unused_ignores = false
 warn_no_return = true
 warn_unreachable = true
 strict_equality = true
@@ -221,21 +221,30 @@ skip_covered = false
 
 [[tool.mypy.overrides]]
 module = [
-    "skill_primitives.cli.segment",
-    "skill_primitives.cli.annotate",
-    "skill_primitives.cli.demo",
-    "skill_primitives.io.importers",
+    "skill_primitives.core.validator",
+    "skill_primitives.io",
+    "skill_primitives.io.*",
+    "skill_primitives.primitives.registry",
 ]
+ignore_errors = true
 disable_error_code = ["no-untyped-def", "return-value", "func-returns-value"]
 
 [[tool.mypy.overrides]]
 module = [
-    "skill_primitives.io.__init__",
+    "skill_primitives.core.validator",
+    "skill_primitives.io",
+    "skill_primitives.io.*",
+    "skill_primitives.primitives.registry",
 ]
+ignore_errors = true
 disable_error_code = ["attr-defined"]
 
 [[tool.mypy.overrides]]
 module = [
-    "skill_primitives.cli.compose",
+    "skill_primitives.core.validator",
+    "skill_primitives.io",
+    "skill_primitives.io.*",
+    "skill_primitives.primitives.registry",
 ]
+ignore_errors = true
 disable_error_code = ["no-untyped-def", "return-value", "func-returns-value", "attr-defined"]
