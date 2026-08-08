@@ -25,7 +25,7 @@ class Lift(Primitive):
         velocity: np.ndarray | None = None,
     ) -> list[dict[str, Any]]:
         """Detect lift segments: positive z-velocity with closed gripper."""
-        segments = []
+        segments: list[dict[str, Any]] = []
         if len(gripper) < 3:
             return segments
 

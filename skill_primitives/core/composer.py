@@ -97,7 +97,7 @@ class SkillLibrary:
                 trajectory: dict[str, Any] = {}
                 if traj_file.exists():
                     try:
-                        import pandas as pd
+                        import pandas as pd  # type: ignore[import-untyped]
 
                         df = pd.read_parquet(traj_file)
                         trajectory = {"data": df.to_dict("records")}
@@ -227,7 +227,7 @@ class ComposedTask:
             path: Output file path (should end in .parquet).
         """
         try:
-            import pandas as pd
+            import pandas as pd  # type: ignore[import-untyped]
         except ImportError as err:
             raise ImportError(
                 "pandas is required for LeRobot export. " "Install with: pip install pandas"

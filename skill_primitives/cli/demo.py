@@ -15,7 +15,7 @@ from skill_primitives.core.composer import compose
 from skill_primitives.core.segmenter import segment_episode
 
 
-def main(argv=None):
+def main(argv=None) -> None:
     print("=" * 60)
     print("  Skill Primitives — Hello Demo")
     print("  Natural Language to Robot Motion")

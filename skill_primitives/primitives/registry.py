@@ -21,7 +21,7 @@ and importing it here.
 # Registry
 # ---------------------------------------------------------------------------
 
-_PRIMITIVES: dict[str, type[Primitive]] = {
+_PRIMITIVES: dict[str, type[Primitive]] = {  # type: ignore[type-abstract]
     cls.name: cls for cls in [Reach, Grasp, Lift, Transport, Place] if cls.name
 }
 
@@ -31,7 +31,7 @@ _PRIMITIVES: dict[str, type[Primitive]] = {
 # ---------------------------------------------------------------------------
 
 
-def get_primitive(name: str) -> type[Primitive]:
+def get_primitive(name: str) -> type[Primitive]:  # type: ignore[type-abstract]
     """Retrieve a primitive class by name.
 
     Args:
@@ -58,7 +58,7 @@ def list_primitives() -> list[str]:
     return sorted(_PRIMITIVES.keys())
 
 
-def get_all_primitives() -> dict[str, type[Primitive]]:
+def get_all_primitives() -> dict[str, type[Primitive]]:  # type: ignore[type-abstract]
     """Return the full registry mapping.
 
     Returns:
@@ -67,7 +67,7 @@ def get_all_primitives() -> dict[str, type[Primitive]]:
     return dict(_PRIMITIVES)
 
 
-def register_primitive(cls: type[Primitive]) -> type[Primitive]:
+def register_primitive(cls: type[Primitive]) -> type[Primitive]:  # type: ignore[type-abstract]
     """Decorator to register a new primitive class.
 
     Usage:

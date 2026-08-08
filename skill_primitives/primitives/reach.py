@@ -30,7 +30,7 @@ class Reach(Primitive):
         that precede grasping. We approximate by finding motion
         peaks before gripper closure transitions.
         """
-        segments = []
+        segments: list[dict[str, Any]] = []
         if len(gripper) < 5:
             return segments
 

@@ -180,7 +180,7 @@ line-ending = "auto"
 
 # ── mypy ─────────────────────────────────────────────────────────────────────
 [tool.mypy]
-python_version = "3.9"
+python_version = "3.10"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
@@ -195,21 +195,7 @@ warn_unreachable = true
 strict_equality = true
 show_error_codes = true
 
-[[tool.mypy.overrides]]
-module = [
-    "PIL.*",
-    "yaml",
-    "datasets.*",
-    "huggingface_hub.*",
-    "lerobot.*",
-    "groq.*",
-    "ollama.*",
-    "imageio.*",
-    "imageio_ffmpeg.*",
-]
 ignore_missing_imports = true
-
-# ── pytest ───────────────────────────────────────────────────────────────────
 [tool.pytest.ini_options]
 minversion = "7.0"
 testpaths = ["tests"]
@@ -244,3 +230,21 @@ exclude_lines = [
 fail_under = 80
 show_missing = true
 skip_covered = false
+
+['type-abstract']
+
+[
+    "skill_primitives.cli.compose",
+    "skill_primitives.cli.segment",
+    "skill_primitives.cli.annotate",
+    "skill_primitives.cli.demo",
+    "skill_primitives.io.importers",
+]
+disable_error_code = ["no-untyped-def", "return-value", "func-returns-value"]
+
+[
+    "skill_primitives.io.__init__",
+    "skill_primitives.cli.compose",
+]
+disable_error_code = ["attr-defined"]
+

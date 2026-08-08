@@ -15,7 +15,7 @@ from pathlib import Path
 from skill_primitives.core.annotator import Annotator
 
 
-def main(argv=None):
+def main(argv=None) -> None:
     parser = argparse.ArgumentParser(
         description="Annotate skill primitives with natural language descriptions",
         formatter_class=argparse.RawDescriptionHelpFormatter,

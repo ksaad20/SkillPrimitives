@@ -32,7 +32,7 @@ class ParquetExporter(BaseExporter):
     """Export primitives to Parquet via pandas."""
 
     def export(self, primitives: list[dict[str, Any]], path: str) -> None:
-        import pandas as pd
+        import pandas as pd  # type: ignore[import-untyped]
 
         full_path = self.output_dir / path
 
@@ -56,7 +56,7 @@ class ParquetExporter(BaseExporter):
         print(f"Exported {len(primitives)} primitives to {full_path}")
 
     def export_batch(self, tasks: list[dict[str, Any]], path: str) -> None:
-        import pandas as pd
+        import pandas as pd  # type: ignore[import-untyped]
 
         records = []
         for task_idx, task in enumerate(tasks):
@@ -115,7 +115,7 @@ class LeRobotExporter(BaseExporter):
         path: str,
         episode_idx: int = 0,
     ) -> None:
-        import pandas as pd
+        import pandas as pd  # type: ignore[import-untyped]
 
         rows = []
         global_frame = 0

@@ -42,7 +42,7 @@ class LeRobotAdapter(BaseAdapter):
                 "The 'datasets' library is required. " "Install with: pip install datasets"
             ) from err
 
-            ds = load_dataset(
+            ds = load_dataset(  # type: ignore
                 dataset_path, split="train", streaming=False, revision="main"
             )  # nosec B615 - intentionally tracking main branch for latest data
 
@@ -145,7 +145,7 @@ class LeRobotAdapter(BaseAdapter):
                 "The 'datasets' library is required. " "Install with: pip install datasets"
             ) from err
 
-        ds = load_dataset(
+        ds = load_dataset(  # type: ignore
             dataset_path, split="train", streaming=False, revision="main"
         )  # nosec B615 - intentionally tracking main branch for latest data
 

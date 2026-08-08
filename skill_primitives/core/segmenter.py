@@ -135,7 +135,7 @@ def detect_grasp_segments(gripper: np.ndarray) -> list[dict[str, Any]]:
     Returns:
         List of segment dicts with keys: type, start, end, confidence.
     """
-    segments = []
+    segments: list[dict[str, Any]] = []
     if len(gripper) < 2:
         return segments
 
@@ -167,7 +167,7 @@ def detect_place_segments(gripper: np.ndarray) -> list[dict[str, Any]]:
     Returns:
         List of segment dicts with keys: type, start, end, confidence.
     """
-    segments = []
+    segments: list[dict[str, Any]] = []
     if len(gripper) < 2:
         return segments
 
@@ -205,7 +205,7 @@ def detect_reach_segments(
     Returns:
         List of reach segment dicts.
     """
-    segments = []
+    segments: list[dict[str, Any]] = []
     if len(gripper) == 0 or len(velocity) == 0:
         return segments
 
@@ -258,7 +258,7 @@ def detect_lift_segments(
     Returns:
         List of lift segment dicts.
     """
-    segments = []
+    segments: list[dict[str, Any]] = []
     if len(gripper) == 0 or len(velocity) == 0:
         return segments
 
@@ -318,7 +318,7 @@ def detect_transport_segments(
     Returns:
         List of transport segment dicts.
     """
-    segments = []
+    segments: list[dict[str, Any]] = []
     if len(gripper) == 0 or len(velocity) == 0:
         return segments
 

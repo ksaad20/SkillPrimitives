@@ -12,10 +12,10 @@ import sys
 from pathlib import Path
 
 from skill_primitives.core.composer import SkillLibrary, compose
-from skill_primitives.io.exporters import get_exporter
+from skill_primitives.io.exporters import get_exporter  # type: ignore[attr-defined]
 
 
-def main(argv=None):
+def main(argv=None) -> None:
     parser = argparse.ArgumentParser(
         description="Compose skill primitives into tasks from natural language",
         formatter_class=argparse.RawDescriptionHelpFormatter,

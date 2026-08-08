@@ -17,7 +17,7 @@ from skill_primitives.core.segmenter import segment_episode
 from skill_primitives.io.lerobot_adapter import LeRobotAdapter
 
 
-def main(argv=None):
+def main(argv=None) -> None:
     parser = argparse.ArgumentParser(
         description="Segment LeRobot episodes into skill primitives",
         formatter_class=argparse.RawDescriptionHelpFormatter,

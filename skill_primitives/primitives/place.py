@@ -25,7 +25,7 @@ class Place(Primitive):
         velocity: np.ndarray | None = None,
     ) -> list[dict[str, Any]]:
         """Detect place segments from gripper opening transitions."""
-        segments = []
+        segments: list[dict[str, Any]] = []
         if len(gripper) < 2:
             return segments
 

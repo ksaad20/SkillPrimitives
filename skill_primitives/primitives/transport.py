@@ -25,7 +25,7 @@ class Transport(Primitive):
         velocity: np.ndarray | None = None,
     ) -> list[dict[str, Any]]:
         """Detect transport segments: horizontal motion with closed gripper."""
-        segments = []
+        segments: list[dict[str, Any]] = []
         if len(gripper) < 3:
             return segments
 
