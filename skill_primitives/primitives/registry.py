@@ -6,7 +6,6 @@ lookup by name and automatic discovery.
 
 from __future__ import annotations
 
-from typing import Any
 
 from skill_primitives.primitives.base import Primitive
 from skill_primitives.primitives.grasp import Grasp  # noqa: F401
