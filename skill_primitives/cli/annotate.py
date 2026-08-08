@@ -13,9 +13,10 @@ import sys
 from pathlib import Path
 
 from skill_primitives.core.annotator import Annotator
+from typing import Any
 
 
-def main(argv=None) -> None:
+def main(argv: Any = None) -> None:
     parser = argparse.ArgumentParser(
         description="Annotate skill primitives with natural language descriptions",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -52,7 +53,7 @@ Examples:
     input_dir = Path(args.input)
     if not input_dir.exists():
         print(f"Error: Input directory not found: {input_dir}")
-        return 1
+        return
 
     annotator = Annotator(provider=args.provider, model=args.model)
 
@@ -60,7 +61,7 @@ Examples:
     meta_files = sorted(input_dir.rglob("*.json"))
     if not meta_files:
         print(f"No .json metadata files found in {input_dir}")
-        return 0
+        return
 
     print(f"Found {len(meta_files)} primitive metadata files")
     print(f"Using provider: {args.provider} / {args.model}")
@@ -101,7 +102,7 @@ Examples:
         print(f"Annotation complete! Updated {annotated_count} files.")
     print(f"{'='*50}")
 
-    return 0
+    return
 
 
 if __name__ == "__main__":

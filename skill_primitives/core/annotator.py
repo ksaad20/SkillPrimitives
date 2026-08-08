@@ -95,7 +95,7 @@ class Annotator:
 
         elif self.provider == "openai":
             try:
-                from openai import OpenAI  # type: ignore[import-not-found]
+                from openai import OpenAI
 
                 kwargs = {"api_key": self.api_key}
                 if self.base_url:
@@ -159,7 +159,7 @@ Command:"""
                 messages=[{"role": "user", "content": prompt}],
                 options={"temperature": 0.3, "num_predict": 30},
             )
-            return response["message"]["content"].strip()  # type: ignore[no-any-return]
+            return response["message"]["content"].strip()
 
         elif self.provider == "groq" or self.provider == "openai":
             response = client.chat.completions.create(
@@ -168,7 +168,7 @@ Command:"""
                 temperature=0.3,
                 max_tokens=30,
             )
-            return response.choices[0].message.content.strip()  # type: ignore[no-any-return]
+            return response.choices[0].message.content.strip()
 
         return ""
 

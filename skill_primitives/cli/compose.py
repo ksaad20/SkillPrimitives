@@ -12,10 +12,11 @@ import sys
 from pathlib import Path
 
 from skill_primitives.core.composer import SkillLibrary, compose
-from skill_primitives.io.exporters import get_exporter  # type: ignore[attr-defined]
+from skill_primitives.io.exporters import get_exporter
+from typing import Any
 
 
-def main(argv=None) -> None:
+def main(argv: Any = None) -> None:
     parser = argparse.ArgumentParser(
         description="Compose skill primitives into tasks from natural language",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -58,13 +59,13 @@ def main(argv=None) -> None:
         path = Path(args.instructions_file)
         if not path.exists():
             print(f"Error: Instructions file not found: {path}")
-            return 1
+            return
         instructions = [line.strip() for line in path.read_text().splitlines() if line.strip()]
     elif args.instructions:
         instructions = args.instructions
     else:
         print("Error: Provide --instructions or --instructions-file")
-        return 1
+        return
 
     print(f"Loading skill library from: {args.library}")
     lib = SkillLibrary.from_disk(args.library)
@@ -101,7 +102,7 @@ def main(argv=None) -> None:
     print(f"Format: {args.format}")
     print("{}".format("=" * 50))
 
-    return 0
+    return
 
 
 if __name__ == "__main__":

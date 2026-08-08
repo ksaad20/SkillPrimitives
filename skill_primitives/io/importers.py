@@ -1,3 +1,5 @@
+from pathlib import Path
+
 """Import trajectories from custom formats.
 
 Provides adapters for loading robot trajectory data from
@@ -27,7 +29,7 @@ def import_csv(path: str, **kwargs) -> dict[str, Any]:
     Returns:
         Standardized episode dict.
     """
-    import pandas as pd  # type: ignore[import-untyped]
+    import pandas as pd
 
     df = pd.read_csv(path, **kwargs)
 
@@ -111,7 +113,7 @@ def import_hdf5(path: str, dataset_key: str = "trajectory") -> dict[str, Any]:
         Standardized episode dict.
     """
     try:
-        import h5py  # type: ignore[import-not-found]
+        import h5py
     except ImportError as err:
         raise ImportError(
             "h5py is required for HDF5 import. " "Install with: pip install h5py"

@@ -15,9 +15,10 @@ from pathlib import Path
 from skill_primitives.core.annotator import Annotator
 from skill_primitives.core.segmenter import segment_episode
 from skill_primitives.io.lerobot_adapter import LeRobotAdapter
+from typing import Any
 
 
-def main(argv=None) -> None:
+def main(argv: Any = None) -> None:
     parser = argparse.ArgumentParser(
         description="Segment LeRobot episodes into skill primitives",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -129,7 +130,7 @@ def main(argv=None) -> None:
     print(f"  Output: {out_dir.absolute()}")
     print("{}".format("=" * 50))
 
-    return 0
+    return
 
 
 if __name__ == "__main__":

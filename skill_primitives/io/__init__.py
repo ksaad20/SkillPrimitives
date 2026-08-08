@@ -9,8 +9,8 @@ from skill_primitives.io.exporters import (
     JSONExporter,
     LeRobotExporter,
     ParquetExporter,
-    ROS2Exporter,  # type: ignore[attr-defined]
-    get_exporter,  # type: ignore[attr-defined]
+    ROS2Exporter,
+    get_exporter,
 )
 from skill_primitives.io.importers import (
     import_csv,
@@ -26,8 +26,8 @@ __all__ = [
     "JSONExporter",
     "ParquetExporter",
     "LeRobotExporter",
-    "ROS2Exporter",  # type: ignore[attr-defined]
-    "get_exporter",  # type: ignore[attr-defined]
+    "ROS2Exporter",
+    "get_exporter",
     "import_csv",
     "import_hdf5",
     "import_numpy",

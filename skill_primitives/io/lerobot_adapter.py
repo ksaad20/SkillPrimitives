@@ -9,6 +9,7 @@ from __future__ import annotations
 from typing import Any
 
 import numpy as np
+from datasets import Dataset
 
 from skill_primitives.io.base import BaseAdapter
 
@@ -42,7 +43,7 @@ class LeRobotAdapter(BaseAdapter):
                 "The 'datasets' library is required. " "Install with: pip install datasets"
             ) from err
 
-            ds = load_dataset(  # type: ignore
+            ds: Dataset = load_dataset(
                 dataset_path, split="train", streaming=False, revision="main"
             )  # nosec B615 - intentionally tracking main branch for latest data
 
@@ -145,7 +146,7 @@ class LeRobotAdapter(BaseAdapter):
                 "The 'datasets' library is required. " "Install with: pip install datasets"
             ) from err
 
-        ds = load_dataset(  # type: ignore
+        ds: Dataset = load_dataset(
             dataset_path, split="train", streaming=False, revision="main"
         )  # nosec B615 - intentionally tracking main branch for latest data
 
