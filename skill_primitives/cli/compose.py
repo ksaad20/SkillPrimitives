@@ -19,11 +19,11 @@ def main(argv=None):
     parser = argparse.ArgumentParser(
         description="Compose skill primitives into tasks from natural language",
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog=(
+                epilog=(
             "Examples:\n"
-            "  %(prog)s --library ./my_skills/ --instructions \"reach the red cube\" \"grasp firmly\" \"lift 5cm\" \"place in bin\"\n"
+            '  %(prog)s --library ./my_skills/ --instructions "reach the red cube" "grasp firmly" "lift 5cm" "place in bin"\n'
             "  %(prog)s --library ./my_skills/ --instructions-file task.txt --output task.json --format json\n"
-            "  %(prog)s --library ./my_skills/ --instructions \"reach\" \"grasp\" \"lift\" --output task.parquet --format lerobot"
+            '  %(prog)s --library ./my_skills/ --instructions "reach" "grasp" "lift" --output task.parquet --format lerobot'
         ),
     )
     parser.add_argument(
