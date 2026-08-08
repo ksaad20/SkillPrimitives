@@ -162,7 +162,7 @@ Command:"""
                 temperature=0.3,
                 max_tokens=30,
             )
-            return response.choices[0].message.content.strip()
+            return cast(str, response.choices[0].message.content)
 
         return ""
 
