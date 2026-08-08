@@ -1,18 +1,12 @@
-"""CLI: Annotate segmented primitives with natural language.
-
-Usage:
-    python -m skill_primitives.annotate --input ./my_skills/ --provider ollama
-    python -m skill_primitives.annotate --input ./my_skills/ --provider groq --model llama-3.1-8b-instant
-"""
-
 from __future__ import annotations
-from skill_primitives.core.annotator import Annotator
-from typing import Any
 
 import argparse
 import json
-import sys
 from pathlib import Path
+import sys
+from typing import Any
+
+from skill_primitives.core.annotator import Annotator
 
 
 def main(argv: Any = None) -> None:
