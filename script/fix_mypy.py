@@ -204,9 +204,7 @@ def main() -> None:
     subprocess.run(["black", "."], check=False)
 
     print("\nRunning mypy...")
-    result = subprocess.run(
-        ["mypy", "skill_primitives"], capture_output=True, text=True
-    )
+    result = subprocess.run(["mypy", "skill_primitives"], capture_output=True, text=True)
     print(result.stdout)
     if result.returncode == 0:
         print("\nAll mypy errors resolved!")
