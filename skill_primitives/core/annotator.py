@@ -12,11 +12,11 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     import ollama
-else:
-    try:
-        import ollama
-        except ImportError:
-        ollama = None
+
+try:
+    import ollama
+except ImportError:
+    ollama = None
 
 
 class Annotator:
