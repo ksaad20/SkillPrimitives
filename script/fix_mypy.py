@@ -17,7 +17,6 @@ def fix_lerobot_adapter(path: Path) -> None:
     content = path.read_text()
     content = strip_type_ignores(content)
 
-    # Add 'from datasets import Dataset' after 'from __future__' or at top
     if "from datasets import Dataset" not in content:
         lines = content.splitlines(keepends=True)
         insert_idx = 0
@@ -27,7 +26,6 @@ def fix_lerobot_adapter(path: Path) -> None:
         lines.insert(insert_idx, "from datasets import Dataset\n")
         content = "".join(lines)
 
-    # Annotate 'ds = load_dataset(...)' -> 'ds: Dataset = load_dataset(...)'
     content = re.sub(
         r"^(\s+)ds\s*=\s*(load_dataset\()",
         r"\1ds: Dataset = \2",
@@ -40,9 +38,8 @@ def fix_lerobot_adapter(path: Path) -> None:
 
 
 def _add_any_types(match: re.Match) -> str:
-    """Add Any type annotations to all bare parameters."""
-    prefix = match.group(1)   # "def foo("
-    params = match.group(2)   # "a, b, c=1"
+    prefix = match.group(1)  # "def foo("
+    params = match.group(2)  # "a, b, c=1"
     ret = match.group(3) or ""
     if not ret:
         ret = " -> Any"
@@ -68,20 +65,17 @@ def fix_importers(path: Path) -> None:
     content = path.read_text()
     content = strip_type_ignores(content)
 
-    # Add imports if missing
     if "from typing import Any" not in content:
         content = "from typing import Any\n" + content
     if "from pathlib import Path" not in content:
         content = "from pathlib import Path\n" + content
 
-    # Heuristic: find 'def import_file(path' or similar and add types
     content = re.sub(
         r"^(def \w+\()path\)(\s*->\s*None)?:",
         r"\1path: str | Path) -> dict[str, Any]:",
         content,
         flags=re.MULTILINE,
     )
-    # Fallback: any def with bare params and no types
     content = re.sub(
         r"^(def \w+\()([^:)]*)\)(\s*->\s*[^:]*)?:",
         _add_any_types,
@@ -104,7 +98,6 @@ def fix_io_init(path: Path) -> None:
     content = path.read_text()
     content = strip_type_ignores(content)
 
-    # Comment out broken imports
     content = content.replace(
         "from skill_primitives.io.exporters import ROS2Exporter, get_exporter",
         "# from skill_primitives.io.exporters import ROS2Exporter, get_exporter  # TODO: implement",
@@ -118,31 +111,36 @@ def fix_cli_file(path: Path) -> None:
     content = path.read_text()
     content = strip_type_ignores(content)
 
-    # Add 'from typing import Any' if missing
     if "from typing import Any" not in content and "from typing" not in content:
         lines = content.splitlines(keepends=True)
         insert_idx = 0
         for i, line in enumerate(lines):
-            if line.startswith("from __future__") or line.startswith("import ") or line.startswith("from "):
+            if (
+                line.startswith("from __future__")
+                or line.startswith("import ")
+                or line.startswith("from ")
+            ):
                 insert_idx = i + 1
         lines.insert(insert_idx, "from typing import Any\n")
         content = "".join(lines)
 
-    # Add 'from pathlib import Path' if missing
     if "from pathlib import Path" not in content:
         lines = content.splitlines(keepends=True)
         insert_idx = 0
         for i, line in enumerate(lines):
-            if line.startswith("from __future__") or line.startswith("import ") or line.startswith("from "):
+            if (
+                line.startswith("from __future__")
+                or line.startswith("import ")
+                or line.startswith("from ")
+            ):
                 insert_idx = i + 1
         lines.insert(insert_idx, "from pathlib import Path\n")
         content = "".join(lines)
 
-    # Fix 'def main(...)' -> add -> None and type any bare params
     def fix_main_sig(match: re.Match) -> str:
-        prefix = match.group(1)      # "def main("
-        params = match.group(2)      # "input, output"
-        ret = match.group(3) or ""   # existing return annotation
+        prefix = match.group(1)  # "def main("
+        params = match.group(2)  # "input, output"
+        ret = match.group(3) or ""  # existing return annotation
         if not ret.strip():
             ret = " -> None"
 
@@ -169,7 +167,6 @@ def fix_cli_file(path: Path) -> None:
         flags=re.MULTILINE,
     )
 
-    # Fix 'return 0' / 'return 1' / 'return result' inside main -> bare 'return'
     content = re.sub(r"^(\s+)return\s+\S+", r"\1return", content, flags=re.MULTILINE)
 
     path.write_text(content)
@@ -207,7 +204,9 @@ def main() -> None:
     subprocess.run(["black", "."], check=False)
 
     print("\nRunning mypy...")
-    result = subprocess.run(["mypy", "skill_primitives"], capture_output=True, text=True)
+    result = subprocess.run(
+        ["mypy", "skill_primitives"], capture_output=True, text=True
+    )
     print(result.stdout)
     if result.returncode == 0:
         print("\nAll mypy errors resolved!")
