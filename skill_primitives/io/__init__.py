@@ -4,7 +4,7 @@ from skill_primitives.io.exporters import (
     LeRobotExporter,
     ParquetExporter,
     ROS2Exporter,
-    get_exporter,
+    get_exporter
 )
 from skill_primitives.io.importers import (
     import_csv,
