@@ -67,7 +67,7 @@ def get_all_primitives() -> dict[str, type[Primitive]]:  # type: ignore[type-abs
     return dict(_PRIMITIVES)
 
 
-def register_primitive(cls: type[Primitive]) -> type[Primitive]:  # type: ignore[type-abstract]
+def register_primitive(cls: type[Primitive]) -> type[Primitive]:
     """Decorator to register a new primitive class.
 
     Usage:
