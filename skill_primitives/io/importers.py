@@ -1,5 +1,4 @@
-from pathlib import Path
-
+import numpy as np
 """Import trajectories from custom formats.
 
 Provides adapters for loading robot trajectory data from
@@ -7,10 +6,8 @@ non-LeRobot sources (CSV, HDF5, ROS bags, etc.).
 """
 
 from __future__ import annotations
-
+from pathlib import Path
 from typing import Any
-
-import numpy as np
 
 
 def import_csv(path: str, **kwargs) -> dict[str, Any]:
