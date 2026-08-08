@@ -250,8 +250,8 @@ class ROS2Exporter:
     def _write_csv(self, filename: str, timestamps: np.ndarray, states: np.ndarray
     ) -> Path:
 
-        """Write joint-state CSV compatible with ROS2 JointState messages."""
-         csv_path = self.output_dir / "{filename}_trajectory.csv"
+        csv_path = self.output_dir / (filename + "_trajectory.csv")
+        yaml_path = self.output_dir / (filename + "_metadata.yaml")
 
         header = ["time_sec"]
         if self.joint_names and len(self.joint_names) == states.shape[-1]:
