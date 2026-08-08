@@ -11,8 +11,6 @@ from skill_primitives.primitives.lift import Lift
 from skill_primitives.primitives.place import Place
 from skill_primitives.primitives.reach import Reach
 from skill_primitives.primitives.registry import (
-    create_detector,
-    detect_all,
     get_all_primitives,
     get_primitive,
     list_primitives,
