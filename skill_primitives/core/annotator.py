@@ -94,7 +94,9 @@ class Annotator:
                     kwargs["base_url"] = self.base_url
                 self._client = OpenAI(**kwargs)
             except ImportError as err:
-                raise ImportError("OpenAI SDK not installed. Install with: pip install openai") from err
+                raise ImportError(
+                    "OpenAI SDK not installed. Install with: pip install openai"
+                ) from err
 
         else:
             raise ValueError(
