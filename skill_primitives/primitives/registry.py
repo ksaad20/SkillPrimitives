@@ -31,7 +31,7 @@ _PRIMITIVES: dict[str, type[Primitive]] = {  # type: ignore[type-abstract]
 # ---------------------------------------------------------------------------
 
 
-def get_primitive(name: str) -> type[Primitive]:  # type: ignore[type-abstract]
+def get_primitive(name: str) -> type[Primitive]:
     """Retrieve a primitive class by name.
 
     Args:
@@ -58,7 +58,7 @@ def list_primitives() -> list[str]:
     return sorted(_PRIMITIVES.keys())
 
 
-def get_all_primitives() -> dict[str, type[Primitive]]:  # type: ignore[type-abstract]
+def get_all_primitives() -> dict[str, type[Primitive]]:
     """Return the full registry mapping.
 
     Returns:
