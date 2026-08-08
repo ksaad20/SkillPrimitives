@@ -83,17 +83,13 @@ class ROS2Exporter(Exporter):
             "Trajectory must contain one of: states, actions, observations, state"
         )
 
-    def _extract_timestamps(
-        self, trajectory: dict[str, Any], num_frames: int
-    ) -> np.ndarray:
+    def _extract_timestamps(self, trajectory: dict[str, Any], num_frames: int) -> np.ndarray:
         if "timestamps" in trajectory:
             ts = trajectory["timestamps"]
             return ts if isinstance(ts, np.ndarray) else np.asarray(ts)
         return np.arange(num_frames) / 30.0
 
-    def _write_csv(
-        self, filename: str, timestamps: np.ndarray, states: np.ndarray
-    ) -> Path:
+    def _write_csv(self, filename: str, timestamps: np.ndarray, states: np.ndarray) -> Path:
         csv_path = self.output_dir / (filename + "_trajectory.csv")
         header = ["time_sec"]
         if self.joint_names and len(self.joint_names) == states.shape[-1]:
@@ -105,9 +101,7 @@ class ROS2Exporter(Exporter):
         np.savetxt(csv_path, rows, delimiter=",", header=",".join(header), comments="")
         return csv_path
 
-    def _write_yaml(
-        self, filename: str, csv_path: Path, metadata: dict[str, Any] | None
-    ) -> Path:
+    def _write_yaml(self, filename: str, csv_path: Path, metadata: dict[str, Any] | None) -> Path:
         yaml_path = self.output_dir / (filename + "_metadata.yaml")
         payload = {
             "ros__parameters": {
