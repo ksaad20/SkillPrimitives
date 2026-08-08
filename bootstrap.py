@@ -4,6 +4,7 @@ Bootstrap script for skill-primitives.
 Run: python bootstrap.py
 Then: git init && git add . && git commit -m "v0.1.0"
 """
+
 import os
 import shutil
 import re
