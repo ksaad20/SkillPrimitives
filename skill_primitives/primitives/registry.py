@@ -1,4 +1,4 @@
-"""Auto-discover and register all primitive classes.
+l"""Auto-discover and register all primitive classes.
 
 Provides a central registry for skill primitive types with
 lookup by name and automatic discovery.
@@ -7,12 +7,12 @@ lookup by name and automatic discovery.
 from __future__ import annotations
 
 
-from skill_primitives.primitives.base import Primitive
 from skill_primitives.primitives.grasp import Grasp  # noqa: F401
 from skill_primitives.primitives.lift import Lift  # noqa: F401
 from skill_primitives.primitives.place import Place  # noqa: F401
 from skill_primitives.primitives.reach import Reach  # noqa: F401
 from skill_primitives.primitives.transport import Transport  # noqa: F401
+from skill_primitives.primitives.base import Primitive
 
 # ---------------------------------------------------------------------------
 
