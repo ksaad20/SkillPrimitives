@@ -1,9 +1,3 @@
-l"""Auto-discover and register all primitive classes.
-
-Provides a central registry for skill primitive types with
-lookup by name and automatic discovery.
-"""
-
 from __future__ import annotations
 
 
