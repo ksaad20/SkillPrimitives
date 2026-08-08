@@ -13,7 +13,7 @@ from typing import Any
 # Schema definitions
 # ---------------------------------------------------------------------------
 
-PRIMITIVE_SCHEMA = {
+PRIMITIVE_SCHEMA: dict[str, Any] = {
     "required": {"type", "start", "end"},
     "optional": {"confidence", "description", "metadata", "trajectory"},
     "types": {
@@ -26,7 +26,7 @@ PRIMITIVE_SCHEMA = {
     },
 }
 
-VALID_PRIMITIVE_TYPES = {"reach", "grasp", "lift", "transport", "place"}
+VALID_PRIMITIVE_TYPES: set[str] = {"reach", "grasp", "lift", "transport", "place"}
 
 
 # ---------------------------------------------------------------------------
@@ -46,12 +46,14 @@ def validate_primitive(primitive: dict[str, Any]) -> list[str]:
     errors: list[str] = []
 
     # Check required fields
-    missing = PRIMITIVE_SCHEMA["required"] - set(primitive.keys())
+    required: set[str] = PRIMITIVE_SCHEMA["required"]
+    missing = required - set(primitive.keys())
     if missing:
         errors.append(f"Missing required fields: {sorted(missing)}")
 
     # Check field types
-    for field, expected_type in PRIMITIVE_SCHEMA["types"].items():
+    types_map: dict[str, Any] = PRIMITIVE_SCHEMA["types"]
+    for field, expected_type in types_map.items():
         if field not in primitive:
             continue
         value = primitive[field]
@@ -65,7 +67,7 @@ def validate_primitive(primitive: dict[str, Any]) -> list[str]:
     ptype = primitive.get("type")
     if ptype is not None and ptype not in VALID_PRIMITIVE_TYPES:
         errors.append(
-            f"Unknown primitive type '{ptype}'. " f"Valid types: {sorted(VALID_PRIMITIVE_TYPES)}"
+            f"Unknown primitive type '{ptype}'. Valid types: {sorted(VALID_PRIMITIVE_TYPES)}"
         )
 
     # Check frame range validity
@@ -258,7 +260,7 @@ def validate_skill_library(path: str) -> list[str]:
             try:
                 import yaml
 
-                metadata = yaml.safe_load(meta_file.read_text()) or {}
+                metadata: dict[str, Any] = yaml.safe_load(meta_file.read_text()) or {}
             except Exception as e:
                 errors.append(f"Failed to parse {meta_file}: {e}")
                 continue
@@ -314,7 +316,7 @@ def validate_trajectory(trajectory: dict[str, Any]) -> list[str]:
         return errors
 
     # Check length consistency across arrays
-    lengths = []
+    lengths: list[tuple[str, int]] = []
     for key in found_keys:
         value = trajectory[key]
         if hasattr(value, "__len__"):
