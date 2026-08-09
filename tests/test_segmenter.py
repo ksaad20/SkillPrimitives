@@ -1,9 +1,9 @@
 """Tests for the trajectory segmenter."""
 
-from skill_primitives.core.segmenter import Segmenter
 import numpy as np
 import pytest
 
+from skill_primitives.core.segmenter import Segmenter
 
 class TestSegmenter:
     def _make_synthetic_episode(self) -> dict:
