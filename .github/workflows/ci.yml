@@ -62,7 +62,7 @@ jobs:
   # ── 2. Test Matrix (comprehensive, parallel) ──────────────────────────────
   test:
     name: Test
-    needs: quality                 # Don't waste matrix time if lint fails
+    needs: [quality, zoo]                 # Don't waste matrix time if lint fails
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false             # See all Python/OS failures, not just first
