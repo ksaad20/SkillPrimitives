@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 import numpy as np
-
+import pandas as pd
 
 def import_data(data: dict[str, Any]) -> list[dict[str, Any]]:
     """Import a trajectory from a CSV file.
@@ -21,8 +21,8 @@ def import_data(data: dict[str, Any]) -> list[dict[str, Any]]:
     Returns:
         Standardized episode dict.
     """
-    import pandas as pd
-
+    
+    def import_data(path: str, **kwargs: Any) -> dict[str, Any]:
     df = pd.read_csv(path, **kwargs)
 
     # Normalize column names to lowercase
