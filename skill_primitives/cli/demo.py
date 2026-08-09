@@ -21,7 +21,7 @@ def main() -> None:
     print("      Episode: 0")
 
     try:
-        primitives = segmenter("lerobot/pusht", episode=0)
+        primitives = Segmenter("lerobot/pusht", episode=0)
         source = "live"
     except Exception as e:
         print(f"      Note: Using synthetic fallback ({e})")
