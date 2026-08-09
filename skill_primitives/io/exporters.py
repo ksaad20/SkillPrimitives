@@ -50,6 +50,50 @@ class JSONExporter(Exporter):
         return out_path
 
 
+class ParquetExporter(Exporter):
+    """Export trajectories as Apache Parquet."""
+
+    def export(
+        self,
+        trajectory: dict[str, Any],
+        filename: str,
+        metadata: dict[str, Any] | None = None,
+    ) -> Path:
+        import pandas as pd
+
+        out_path = self.output_dir / (filename + ".parquet")
+
+        # Extract timestamps and states for the DataFrame
+        states = self._extract_states(trajectory)
+        timestamps = self._extract_timestamps(trajectory, len(states))
+
+        data: dict[str, Any] = {"timestamp": timestamps}
+        if states.ndim == 1:
+            data["state_0"] = states
+        else:
+            for i in range(states.shape[1]):
+                data[f"state_{i}"] = states[:, i]
+
+        df = pd.DataFrame(data)
+        df.to_parquet(out_path, index=False)
+        return out_path
+
+    def _extract_states(self, trajectory: dict[str, Any]) -> np.ndarray:
+        for key in ("states", "actions", "observations", "state"):
+            if key in trajectory:
+                value = trajectory[key]
+                return value if isinstance(value, np.ndarray) else np.asarray(value)
+        raise ValueError(
+            "Trajectory must contain one of: states, actions, observations, state"
+        )
+
+    def _extract_timestamps(self, trajectory: dict[str, Any], num_frames: int) -> np.ndarray:
+        if "timestamps" in trajectory:
+            ts = trajectory["timestamps"]
+            return ts if isinstance(ts, np.ndarray) else np.asarray(ts)
+        return np.arange(num_frames) / 30.0
+
+
 class ROS2Exporter(Exporter):
     """Export trajectories to ROS2-compatible CSV + YAML."""
 
@@ -79,15 +123,21 @@ class ROS2Exporter(Exporter):
             if key in trajectory:
                 value = trajectory[key]
                 return value if isinstance(value, np.ndarray) else np.asarray(value)
-        raise ValueError("Trajectory must contain one of: states, actions, observations, state")
+        raise ValueError(
+            "Trajectory must contain one of: states, actions, observations, state"
+        )
 
-    def _extract_timestamps(self, trajectory: dict[str, Any], num_frames: int) -> np.ndarray:
+    def _extract_timestamps(
+        self, trajectory: dict[str, Any], num_frames: int
+    ) -> np.ndarray:
         if "timestamps" in trajectory:
             ts = trajectory["timestamps"]
             return ts if isinstance(ts, np.ndarray) else np.asarray(ts)
         return np.arange(num_frames) / 30.0
 
-    def _write_csv(self, filename: str, timestamps: np.ndarray, states: np.ndarray) -> Path:
+    def _write_csv(
+        self, filename: str, timestamps: np.ndarray, states: np.ndarray
+    ) -> Path:
         csv_path = self.output_dir / (filename + "_trajectory.csv")
         header = ["time_sec"]
         if self.joint_names and len(self.joint_names) == states.shape[-1]:
@@ -95,11 +145,21 @@ class ROS2Exporter(Exporter):
         else:
             header.extend("joint_" + str(i) for i in range(states.shape[-1]))
 
-        rows = np.column_stack([timestamps, states.reshape(len(timestamps), -1)])
-        np.savetxt(csv_path, rows, delimiter=",", header=",".join(header), comments="")
+        rows = np.column_stack(
+            [timestamps, states.reshape(len(timestamps), -1)]
+        )
+        np.savetxt(
+            csv_path,
+            rows,
+            delimiter=",",
+            header=",".join(header),
+            comments="",
+        )
         return csv_path
 
-    def _write_yaml(self, filename: str, csv_path: Path, metadata: dict[str, Any] | None) -> Path:
+    def _write_yaml(
+        self, filename: str, csv_path: Path, metadata: dict[str, Any] | None
+    ) -> Path:
         yaml_path = self.output_dir / (filename + "_metadata.yaml")
         payload = {
             "ros__parameters": {
@@ -137,6 +197,7 @@ class ROS2Exporter(Exporter):
 
 _EXPORTERS: dict[str, type[Exporter]] = {
     "json": JSONExporter,
+    "parquet": ParquetExporter,
     "ros2": ROS2Exporter,
 }
 
