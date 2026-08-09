@@ -26,7 +26,7 @@ def main() -> None:
     try:
         adapter = LeRobotAdapter()
         segmenter = Segmenter()
-        episode = adapter.load_lerobot_episode("lerobot/pusht", episode=0, revision="main")
+        episode = adapter.load_episode("lerobot/pusht", episode=0, revision="main")
         primitives = segmenter.segment(episode)
         source = "live"
     except Exception as e:
