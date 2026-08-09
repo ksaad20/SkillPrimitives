@@ -56,9 +56,7 @@ class BaseAdapter(ABC):
         """
         ...
 
-    def load_all_episodes(
-        self, dataset_path: str, *, revision: str
-    ) -> list[dict[str, Any]]:
+    def load_all_episodes(self, dataset_path: str, *, revision: str) -> list[dict[str, Any]]:
         """Load all episodes from a dataset.
 
         Convenience method that calls load_episode for each available index.
