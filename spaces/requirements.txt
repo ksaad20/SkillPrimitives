@@ -3,7 +3,7 @@
 -e ..
 
 # Gradio for the web UI
-gradio>=4.0.0
+gradio>=6.22.0
 
 # Visualization
 matplotlib>=3.7.0
