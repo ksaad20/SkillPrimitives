@@ -5,7 +5,7 @@ import tempfile
 
 from skill_primitives.core.annotator import Annotator
 from skill_primitives.core.composer import compose
-from skill_primitives.core.segmenter import segment_episode
+from skill_primitives.core.segmenter import Segmenter
 
 
 def main() -> None:
