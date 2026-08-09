@@ -32,7 +32,7 @@ jobs:
             chore
             revert
           requireScope: false
-          subjectPattern: ^[A-Z].+$    # Must start with capital letter
+          subjectPattern: ^[a-zA-Z].+$    # Must start with capital letter
           subjectPatternError: |
             PR title must start with a capital letter (e.g., "Fix bug" not "fix bug").
 
