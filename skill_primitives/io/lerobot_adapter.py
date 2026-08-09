@@ -133,8 +133,6 @@ class LeRobotAdapter(BaseAdapter):
             "num_frames": num_frames,
             "fps": 20.0,
         }
-
-        cleanup()
         return result
 
     def list_episodes(
