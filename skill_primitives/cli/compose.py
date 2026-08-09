@@ -88,6 +88,9 @@ def main(argv: Any = None) -> None:
 
     exporter.export(task_dict, str(output_path))
 
+    exporter = Exporter()
+    result = exporter.export(data, filename)
+
     print("")
     print("{}".format("=" * 50))
     print(f"Task exported to: {output_path.absolute()}")
