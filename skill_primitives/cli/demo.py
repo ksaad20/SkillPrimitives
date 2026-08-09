@@ -16,7 +16,6 @@ def main() -> None:
     print("  Skill Primitives — Hello Demo")
     print("  Natural Language to Robot Motion")
     print("=" * 60)
-
     # Step 1: Segment
     print("")
     print("[1/4] Segmenting a sample LeRobot episode...")
