@@ -23,7 +23,6 @@ def import_data(data: dict[str, Any]) -> list[dict[str, Any]]:
         Standardized episode dict.
     """
 
-    
     def import_data(path: str, **kwargs: Any) -> dict[str, Any]:
 
         df = pd.read_csv(path, **kwargs)
