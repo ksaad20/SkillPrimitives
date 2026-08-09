@@ -36,17 +36,17 @@ class LeRobotAdapter(BaseAdapter):
         Returns:
             Standardized episode dict.
         """
-        try:
+                try:
             from datasets import load_dataset
         except ImportError as err:
             raise ImportError(
-                "The 'datasets' library is required. " "Install with: pip install datasets"
+                "The 'datasets' library is required. "
+                "Install with: pip install datasets"
             ) from err
 
-            ds: Dataset = load_dataset(
-                dataset_path, split="train", streaming=False, revision="main"
-            )  # nosec B615 - intentionally tracking main branch for latest data
-
+        ds: Dataset = load_dataset(
+            dataset_path, split="train", streaming=False, revision="main"
+        )
         # Filter to specific episode
         if "episode_index" in ds.column_names:
             episode_data = ds.filter(lambda x: x["episode_index"] == episode_index)
