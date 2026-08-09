@@ -74,8 +74,14 @@ def _visualize_segments(segments: list[dict], path: Path) -> None:
     colors = {"reach": "blue", "grasp": "green", "lift": "orange", "transport": "purple", "place": "red"}
 
     for seg in segments:
-        color = colors.get(seg["type"], "gray")
-        ax.barh(seg["type"], seg["end"] - seg["start"], left=seg["start"], color=color, alpha=0.6)
+        colors = {
+         "reach": "blue",
+         "grasp": "green",
+         "lift": "orange",
+         "transport": "purple",
+         "place": "red",
+     }
+    ax.barh(seg["type"], seg["end"] - seg["start"], left=seg["start"], color=color, alpha=0.6)
 
     ax.set_xlabel("Frame")
     ax.set_title("Detected Skill Primitives")
