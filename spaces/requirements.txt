@@ -1,9 +1,25 @@
-# Skill Primitives Space dependencies
-# Install the package from the parent directory
--e ..
 
-# Gradio for the web UI
-gradio>=6.22.0
+# Hugging Face Spaces requirements
+# Generated from spaces/app.py imports + skill_primitives runtime deps
 
-# Visualization
-matplotlib>=3.7.0
+# Core Gradio dependency for the HF Space UI
+gradio>=4.0,<6.0
+
+# skill_primitives runtime dependencies
+numpy>=1.24
+pandas>=2.0
+PyYAML>=6.0
+Jinja2>=3.1
+rich>=13.0
+
+# Optional: LLM providers (used by Annotator)
+# Uncomment the one(s) you need:
+# openai>=1.0
+# groq>=0.4
+# ollama>=0.1
+
+# Optional: HDF5 import support
+# h5py>=3.0
+
+# Optional: LeRobot dataset loading
+# lerobot>=0.1
