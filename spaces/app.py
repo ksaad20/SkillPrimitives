@@ -33,10 +33,12 @@ def segment_dataset(dataset_name: str, episode: int) -> tuple[str, str]:
     # Build markdown table
     lines = [
         "| # | Type | Frames | Confidence |",
-        "|---|------|--------|------------|",
+        "|---|---|------|--------|------------|",
     ]
     for i, p in enumerate(primitives):
-        lines.append(f"| {i+1} | `{p['type']}` | {p['start']}-{p['end']} | {p['confidence']:.2f} |")
+        lines.append(
+            f"| {i + 1} | `{p['type']}` | {p['start']}-{p['end']} | {p['confidence']:.2f} |"
+        )
 
     return "\n".join(lines), json.dumps(primitives, indent=2)
 
@@ -65,11 +67,11 @@ def annotate_primitives_json(primitives_json: str, provider: str, model: str) ->
 
     lines = [
         "| # | Type | Description |",
-        "|---|------|-------------|",
+        "|---|---|------|-------------|",
     ]
     for i, p in enumerate(annotated):
         desc = p.get("description", "—")
-        lines.append(f"| {i+1} | `{p['type']}` | {desc} |")
+        lines.append(f"| {i + 1} | `{p['type']}` | {desc} |")
 
     return "\n".join(lines)
 
@@ -83,7 +85,9 @@ def compose_task(instructions_text: str) -> tuple[str, str]:
     Returns:
         Tuple of (markdown output, JSON export).
     """
-    instructions = [line.strip() for line in instructions_text.splitlines() if line.strip()]
+    instructions = [
+        line.strip() for line in instructions_text.splitlines() if line.strip()
+    ]
 
     if not instructions:
         return "Please enter at least one instruction.", "{}"
@@ -94,7 +98,7 @@ def compose_task(instructions_text: str) -> tuple[str, str]:
         f"**Composed {len(task.skills)} primitives** (est. duration: {task.duration:.1f}s)",
         "",
         "| # | Type | Instruction |",
-        "|---|------|-------------|",
+        "|---|---|------|-------------|",
     ]
     for i, p in enumerate(task.primitives, 1):
         lines.append(f"| {i} | `{p['type']}` | {p['instruction']} |")
