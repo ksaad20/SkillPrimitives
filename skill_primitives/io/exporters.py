@@ -83,9 +83,7 @@ class ParquetExporter(Exporter):
             if key in trajectory:
                 value = trajectory[key]
                 return value if isinstance(value, np.ndarray) else np.asarray(value)
-        raise ValueError(
-            "Trajectory must contain one of: states, actions, observations, state"
-        )
+        raise ValueError("Trajectory must contain one of: states, actions, observations, state")
 
     def _extract_timestamps(self, trajectory: dict[str, Any], num_frames: int) -> np.ndarray:
         if "timestamps" in trajectory:
@@ -123,21 +121,15 @@ class ROS2Exporter(Exporter):
             if key in trajectory:
                 value = trajectory[key]
                 return value if isinstance(value, np.ndarray) else np.asarray(value)
-        raise ValueError(
-            "Trajectory must contain one of: states, actions, observations, state"
-        )
+        raise ValueError("Trajectory must contain one of: states, actions, observations, state")
 
-    def _extract_timestamps(
-        self, trajectory: dict[str, Any], num_frames: int
-    ) -> np.ndarray:
+    def _extract_timestamps(self, trajectory: dict[str, Any], num_frames: int) -> np.ndarray:
         if "timestamps" in trajectory:
             ts = trajectory["timestamps"]
             return ts if isinstance(ts, np.ndarray) else np.asarray(ts)
         return np.arange(num_frames) / 30.0
 
-    def _write_csv(
-        self, filename: str, timestamps: np.ndarray, states: np.ndarray
-    ) -> Path:
+    def _write_csv(self, filename: str, timestamps: np.ndarray, states: np.ndarray) -> Path:
         csv_path = self.output_dir / (filename + "_trajectory.csv")
         header = ["time_sec"]
         if self.joint_names and len(self.joint_names) == states.shape[-1]:
@@ -145,9 +137,7 @@ class ROS2Exporter(Exporter):
         else:
             header.extend("joint_" + str(i) for i in range(states.shape[-1]))
 
-        rows = np.column_stack(
-            [timestamps, states.reshape(len(timestamps), -1)]
-        )
+        rows = np.column_stack([timestamps, states.reshape(len(timestamps), -1)])
         np.savetxt(
             csv_path,
             rows,
@@ -157,9 +147,7 @@ class ROS2Exporter(Exporter):
         )
         return csv_path
 
-    def _write_yaml(
-        self, filename: str, csv_path: Path, metadata: dict[str, Any] | None
-    ) -> Path:
+    def _write_yaml(self, filename: str, csv_path: Path, metadata: dict[str, Any] | None) -> Path:
         yaml_path = self.output_dir / (filename + "_metadata.yaml")
         payload = {
             "ros__parameters": {
