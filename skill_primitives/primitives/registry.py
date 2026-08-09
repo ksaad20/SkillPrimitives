@@ -30,7 +30,6 @@ def get_primitive(name: str) -> type[Primitive]:
         raise KeyError("Unknown primitive: '" + name + "'. Available primitives: " + available)
     return _PRIMITIVES[name]
 
-
 def list_primitives() -> list[str]:
     """Return a sorted list of all registered primitive names.
 
@@ -39,7 +38,6 @@ def list_primitives() -> list[str]:
     """
     return sorted(_PRIMITIVES.keys())
 
-
 def get_all_primitives() -> dict[str, type[Primitive]]:
     """Return a copy of the full primitive registry.
 
@@ -47,7 +45,6 @@ def get_all_primitives() -> dict[str, type[Primitive]]:
         Dict mapping primitive names to their classes.
     """
     return dict(_PRIMITIVES)
-
 
 def register_primitive(cls: type[Primitive]) -> type[Primitive]:
     """Decorator to register a primitive class.
