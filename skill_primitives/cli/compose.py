@@ -6,6 +6,7 @@ from typing import Any
 
 from skill_primitives.core.composer import SkillLibrary, compose
 from skill_primitives.io.exporters import get_exporter
+from skill_primitives.io.exporters import Exporter
 
 
 def main(argv: Any = None) -> None:
@@ -86,6 +87,7 @@ def main(argv: Any = None) -> None:
         "estimated_duration": task.duration,
     }
 
+    exporter = Exporter()
     exporter.export(task_dict, str(output_path))
 
     print("")
