@@ -174,7 +174,7 @@ def import_numpy(path: str) -> dict[str, Any]:
     Returns:
         Standardized episode dict.
     """
-    data = np.load(path)
+    data = np.load(path, allow_pickle=False)
 
     result: dict[str, Any] = {
         "source_path": path,
