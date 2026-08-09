@@ -5,8 +5,7 @@ from pathlib import Path
 from typing import Any
 
 from skill_primitives.core.composer import SkillLibrary, compose
-from skill_primitives.io.exporters import get_exporter
-from skill_primitives.io.exporters import Exporter
+from skill_primitives.io.exporters import Exporter, get_exporter
 
 
 def main(argv: Any = None) -> None:
