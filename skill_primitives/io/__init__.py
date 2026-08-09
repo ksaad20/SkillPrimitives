@@ -19,7 +19,7 @@ __all__ = [
     "LeRobotExporter",
     "ROS2Exporter",
     "get_exporter",
-    "import_csv",
+    "import_data",
     "import_hdf5",
     "import_numpy",
 ]
