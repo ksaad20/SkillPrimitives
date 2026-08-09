@@ -20,8 +20,6 @@ from pathlib import Path
 from typing import Optional
 
 import yaml
-import jinja2
-import rich
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
