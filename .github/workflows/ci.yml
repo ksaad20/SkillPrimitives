@@ -124,7 +124,7 @@ jobs:
           pip install -e ".[dev]"
 
       - name: Build zoo artifacts
-        run: python scripts/zoo_build.py
+        run: python script/build_zoo.py
 
       - name: Verify manifest exists
         run: test -f zoo_manifest.json
