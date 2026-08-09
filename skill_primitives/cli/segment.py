@@ -7,7 +7,6 @@ import sys
 from collections.abc import Sequence
 from pathlib import Path
 
-
 from skill_primitives.core.segmenter import Segmenter
 from skill_primitives.io.lerobot_adapter import LeRobotAdapter
 
