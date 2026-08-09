@@ -2,7 +2,7 @@
 
 from skill_primitives.core.annotator import Annotator, annotate_primitives
 from skill_primitives.core.composer import ComposedTask, Skill, SkillLibrary, compose
-from skill_primitives.core.segmenter import segment_episode
+from skill_primitives.core.segmenter import Segmenter
 from skill_primitives.core.validator import (
     is_valid_primitive,
     is_valid_sequence,
@@ -15,7 +15,7 @@ from skill_primitives.core.validator import (
 )
 
 __all__ = [
-    "segment_episode",
+    "Segmenter",
     "Annotator",
     "annotate_primitives",
     "compose",
