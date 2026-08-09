@@ -1,0 +1,14 @@
+{
+  "generated_at": "2026-08-09T05:24:26Z",
+  "primitives": [
+    {
+      "name": "reach",
+      "version": "0.0.1",
+      "category": "interaction",
+      "description": "Reach toward a target object in 3D space.",
+      "author": "ksaad20",
+      "files": ["reach.py"],
+      "built_at": "2026-08-09T05:24:26Z"
+    }
+  ]
+}
