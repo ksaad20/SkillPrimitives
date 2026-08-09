@@ -6,7 +6,7 @@ import json
 import tempfile
 
 from skill_primitives.core.annotator import Annotator
-from skill_primitives.core.composer import Compose
+from skill_primitives.core.composer import compose
 from skill_primitives.core.segmenter import Segmenter
 from skill_primitives.io.lerobot_adapter import LeRobotAdapter
 
