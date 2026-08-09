@@ -13,6 +13,7 @@ _PRIMITIVES: dict[str, type[Primitive]] = {}
 
 # ---------------------------------------------------------------------------
 
+
 def get_primitive(name: str) -> type[Primitive]:
     """Retrieve a primitive class by name.
 
