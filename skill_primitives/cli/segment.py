@@ -93,5 +93,3 @@ def _visualize_segments(segments: list[dict[str, Any]], path: Path) -> None:
 
 if __name__ == "__main__":
     sys.exit(main())
-
-return 0
