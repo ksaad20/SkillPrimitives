@@ -114,8 +114,7 @@ def import_hdf5(path: str, dataset_key: str = "trajectory") -> dict[str, Any]:
         if dataset_key not in f:
             available = list(f.keys())
             raise KeyError(
-                f"Dataset '{dataset_key}' not found in {path}. "
-                f"Available keys: {available}"
+                f"Dataset '{dataset_key}' not found in {path}. " f"Available keys: {available}"
             )
 
         data = f[dataset_key]
@@ -183,25 +182,15 @@ def import_numpy(path: str) -> dict[str, Any]:
 
     if "actions" in data:
         result["actions"] = data["actions"]
-        result["action_dim"] = (
-            result["actions"].shape[1] if result["actions"].ndim > 1 else 1
-        )
+        result["action_dim"] = result["actions"].shape[1] if result["actions"].ndim > 1 else 1
     else:
         result["actions"] = np.array([])
         result["action_dim"] = 0
 
-    state_key = (
-        "states"
-        if "states" in data
-        else "observations"
-        if "observations" in data
-        else None
-    )
+    state_key = "states" if "states" in data else "observations" if "observations" in data else None
     if state_key:
         result["states"] = data[state_key]
-        result["state_dim"] = (
-            result["states"].shape[1] if result["states"].ndim > 1 else 1
-        )
+        result["state_dim"] = result["states"].shape[1] if result["states"].ndim > 1 else 1
     else:
         result["states"] = np.array([])
         result["state_dim"] = 0
