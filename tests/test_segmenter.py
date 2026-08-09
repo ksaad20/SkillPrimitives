@@ -5,6 +5,7 @@ import pytest
 
 from skill_primitives.core.segmenter import Segmenter
 
+
 class TestSegmenter:
     def _make_synthetic_episode(self) -> dict:
         """Create a synthetic episode with clear gripper transitions."""
