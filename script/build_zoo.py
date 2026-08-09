@@ -149,7 +149,7 @@ class ZooBuilder:
     # ── Orchestration ──────────────────────────────────────────────────────────
     def build(self, names: Optional[set[str]] = None) -> bool:
         """Run the full build process."""
-        console.rule("[bold blue]🦁 Zoo Builder[/bold blue]")
+        console.rule("[bold blue] Zoo Builder [/bold blue]")
 
         primitives = self.discover_primitives(names)
         if not primitives:
