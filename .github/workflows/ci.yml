@@ -101,7 +101,7 @@ jobs:
           fail_ci_if_error: false    # Don't block CI if Codecov is down
 
       - name: Demo smoke test
-        run: python -m skill_primitives.demo
+        run: python -m skill_primitives.cli.demo
 
   # ── 3. Zoo Build Verification (ensure artifacts generate cleanly) ──────────
   zoo:
