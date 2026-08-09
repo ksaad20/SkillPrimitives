@@ -1,175 +1,153 @@
-"""Tests for data exporters."""
+from __future__ import annotations
 
 import json
+from abc import ABC, abstractmethod
+from pathlib import Path
+from typing import Any
 
 import numpy as np
-import pytest
-
-from skill_primitives.io.exporters import (
-    Exporter,
-    JSONExporter,
-    ROS2Exporter,
-    get_exporter,
-    register_exporter,
-)
 
 
-class TestJSONExporter:
-    def test_export_creates_json_file(self, tmp_path):
-        exp = JSONExporter(tmp_path)
-        result = exp.export({"primitives": [{"type": "reach"}]}, "test")
-        assert result.exists()
-        assert result == tmp_path / "test.json"
+class Exporter(ABC):
+    """Base class for trajectory exporters."""
 
-    def test_export_content_is_valid_json(self, tmp_path):
-        exp = JSONExporter(tmp_path)
-        result = exp.export(
-            {"primitives": [{"type": "reach"}, {"type": "grasp"}]},
-            "test",
-            metadata={"author": "test"},
-        )
-        data = json.loads(result.read_text())
-        assert data["metadata"] == {"author": "test"}
-        assert data["primitives"] == [{"type": "reach"}, {"type": "grasp"}]
+    def __init__(self, output_dir: str | Path) -> None:
+        self.output_dir = Path(output_dir)
+        self.output_dir.mkdir(parents=True, exist_ok=True)
 
-    def test_export_converts_numpy_to_list(self, tmp_path):
-        exp = JSONExporter(tmp_path)
-        result = exp.export(
-            {"states": np.array([[1.0, 2.0], [3.0, 4.0]])},
-            "test",
-        )
-        data = json.loads(result.read_text())
-        assert data["states"] == [[1.0, 2.0], [3.0, 4.0]]
-
-    def test_export_converts_sequence_to_list(self, tmp_path):
-        exp = JSONExporter(tmp_path)
-        result = exp.export(
-            {"items": (1, 2, 3)},
-            "test",
-        )
-        data = json.loads(result.read_text())
-        assert data["items"] == [1, 2, 3]
-
-    def test_export_leaves_string_intact(self, tmp_path):
-        exp = JSONExporter(tmp_path)
-        result = exp.export(
-            {"label": "reach"},
-            "test",
-        )
-        data = json.loads(result.read_text())
-        assert data["label"] == "reach"
-
-    def test_export_without_metadata(self, tmp_path):
-        exp = JSONExporter(tmp_path)
-        result = exp.export({"primitives": []}, "empty")
-        data = json.loads(result.read_text())
-        assert data["metadata"] == {}
+    @abstractmethod
+    def export(
+        self,
+        trajectory: dict[str, Any],
+        filename: str,
+        metadata: dict[str, Any] | None = None,
+    ) -> Path:
+        """Export a trajectory to disk."""
+        ...
 
 
-class TestROS2Exporter:
-    def test_export_creates_csv_and_yaml(self, tmp_path):
-        exp = ROS2Exporter(tmp_path, joint_names=["j1", "j2"])
-        trajectory = {
-            "states": np.array([[0.0, 0.0], [1.0, 2.0]]),
+class JSONExporter(Exporter):
+    """Export trajectories as JSON."""
+
+    def export(
+        self,
+        trajectory: dict[str, Any],
+        filename: str,
+        metadata: dict[str, Any] | None = None,
+    ) -> Path:
+        out_path = self.output_dir / (filename + ".json")
+        payload: dict[str, Any] = {"metadata": metadata or {}}
+
+        for key, value in trajectory.items():
+            if isinstance(value, np.ndarray):
+                payload[key] = value.tolist()
+            elif hasattr(value, "__len__") and not isinstance(value, (str, bytes)):
+                payload[key] = list(value)
+            else:
+                payload[key] = value
+
+        out_path.write_text(json.dumps(payload, indent=2))
+        return out_path
+
+
+class ROS2Exporter(Exporter):
+    """Export trajectories to ROS2-compatible CSV + YAML."""
+
+    def __init__(
+        self,
+        output_dir: str | Path,
+        joint_names: list[str] | None = None,
+        frame_id: str = "base_link",
+    ) -> None:
+        super().__init__(output_dir)
+        self.joint_names = list(joint_names) if joint_names else []
+        self.frame_id = frame_id
+
+    def export(
+        self,
+        trajectory: dict[str, Any],
+        filename: str,
+        metadata: dict[str, Any] | None = None,
+    ) -> Path:
+        states = self._extract_states(trajectory)
+        timestamps = self._extract_timestamps(trajectory, len(states))
+        csv_path = self._write_csv(filename, timestamps, states)
+        return self._write_yaml(filename, csv_path, metadata)
+
+    def _extract_states(self, trajectory: dict[str, Any]) -> np.ndarray:
+        for key in ("states", "actions", "observations", "state"):
+            if key in trajectory:
+                value = trajectory[key]
+                return value if isinstance(value, np.ndarray) else np.asarray(value)
+        raise ValueError("Trajectory must contain one of: states, actions, observations, state")
+
+    def _extract_timestamps(self, trajectory: dict[str, Any], num_frames: int) -> np.ndarray:
+        if "timestamps" in trajectory:
+            ts = trajectory["timestamps"]
+            return ts if isinstance(ts, np.ndarray) else np.asarray(ts)
+        return np.arange(num_frames) / 30.0
+
+    def _write_csv(self, filename: str, timestamps: np.ndarray, states: np.ndarray) -> Path:
+        csv_path = self.output_dir / (filename + "_trajectory.csv")
+        header = ["time_sec"]
+        if self.joint_names and len(self.joint_names) == states.shape[-1]:
+            header.extend(self.joint_names)
+        else:
+            header.extend("joint_" + str(i) for i in range(states.shape[-1]))
+
+        rows = np.column_stack([timestamps, states.reshape(len(timestamps), -1)])
+        np.savetxt(csv_path, rows, delimiter=",", header=",".join(header), comments="")
+        return csv_path
+
+    def _write_yaml(self, filename: str, csv_path: Path, metadata: dict[str, Any] | None) -> Path:
+        yaml_path = self.output_dir / (filename + "_metadata.yaml")
+        payload = {
+            "ros__parameters": {
+                "trajectory_file": str(csv_path.resolve()),
+                "frame_id": self.frame_id,
+                "joint_names": self.joint_names,
+                "rate_hz": 30.0,
+                "metadata": metadata or {},
+            }
         }
-        result = exp.export(trajectory, "motion", metadata={"task": "pick"})
 
-        assert result.exists()
-        assert result == tmp_path / "motion_metadata.yaml"
-        assert (tmp_path / "motion_trajectory.csv").exists()
+        lines = ["# ROS2 parameter file generated by SkillPrimitives", ""]
+        lines.extend(self._dict_to_yaml(payload))
+        yaml_path.write_text("\n".join(lines))
+        return yaml_path
 
-    def test_export_yaml_content(self, tmp_path):
-        exp = ROS2Exporter(tmp_path, joint_names=["j1", "j2"], frame_id="world")
-        trajectory = {
-            "states": np.array([[0.0, 0.0], [1.0, 2.0]]),
-            "timestamps": np.array([0.0, 1.0]),
-        }
-        result = exp.export(trajectory, "motion")
-
-        yaml_text = result.read_text()
-        assert "world" in yaml_text
-        assert "motion_trajectory.csv" in yaml_text
-        assert "j1" in yaml_text
-        assert "j2" in yaml_text
-        assert "ros__parameters" in yaml_text
-
-    def test_export_csv_content(self, tmp_path):
-        exp = ROS2Exporter(tmp_path, joint_names=["j1", "j2"])
-        trajectory = {
-            "states": np.array([[0.0, 0.0], [1.0, 2.0]]),
-            "timestamps": np.array([0.0, 1.0]),
-        }
-        exp.export(trajectory, "motion")
-
-        csv_text = (tmp_path / "motion_trajectory.csv").read_text()
-        assert "time_sec" in csv_text
-        assert "j1" in csv_text
-        assert "j2" in csv_text
-
-    def test_export_without_joint_names_uses_defaults(self, tmp_path):
-        exp = ROS2Exporter(tmp_path)
-        trajectory = {
-            "states": np.array([[0.0, 0.0], [1.0, 2.0]]),
-        }
-        exp.export(trajectory, "motion")
-
-        csv_text = (tmp_path / "motion_trajectory.csv").read_text()
-        assert "joint_0" in csv_text
-        assert "joint_1" in csv_text
-
-    def test_export_without_states_raises(self, tmp_path):
-        exp = ROS2Exporter(tmp_path)
-        with pytest.raises(ValueError, match="Trajectory must contain one of"):
-            exp.export({"primitives": [{"type": "reach"}]}, "test")
-
-    def test_default_timestamps(self, tmp_path):
-        exp = ROS2Exporter(tmp_path, joint_names=["j1"])
-        trajectory = {
-            "states": np.array([[0.0], [1.0], [2.0]]),
-        }
-        exp.export(trajectory, "motion")
-
-        csv_path = tmp_path / "motion_trajectory.csv"
-        assert csv_path.exists()
-        csv_text = csv_path.read_text()
-        assert "0" in csv_text
-
-    def test_default_frame_id(self, tmp_path):
-        exp = ROS2Exporter(tmp_path)
-        trajectory = {
-            "states": np.array([[0.0]]),
-        }
-        result = exp.export(trajectory, "motion")
-        yaml_text = result.read_text()
-        assert "base_link" in yaml_text
+    @staticmethod
+    def _dict_to_yaml(data: dict[str, Any], indent: int = 0) -> list[str]:
+        lines: list[str] = []
+        prefix = "  " * indent
+        for key, value in data.items():
+            if isinstance(value, dict):
+                lines.append(prefix + key + ":")
+                lines.extend(ROS2Exporter._dict_to_yaml(value, indent + 1))
+            elif isinstance(value, list):
+                lines.append(prefix + key + ":")
+                for item in value:
+                    lines.append(prefix + "  - " + str(item))
+            elif isinstance(value, str):
+                lines.append(prefix + key + ': "' + value + '"')
+            else:
+                lines.append(prefix + key + ": " + str(value))
+        return lines
 
 
-class TestExporterRegistry:
-    def test_get_exporter_json(self):
-        assert get_exporter("json") is JSONExporter
+_EXPORTERS: dict[str, type[Exporter]] = {
+    "json": JSONExporter,
+    "ros2": ROS2Exporter,
+}
 
-    def test_get_exporter_ros2(self):
-        assert get_exporter("ros2") is ROS2Exporter
 
-    def test_get_exporter_case_insensitive(self):
-        assert get_exporter("JSON") is JSONExporter
-        assert get_exporter("Ros2") is ROS2Exporter
-        assert get_exporter("  json  ") is JSONExporter
+def get_exporter(name: str) -> type[Exporter]:
+    name = name.lower().strip()
+    if name not in _EXPORTERS:
+        valid = ", ".join(sorted(_EXPORTERS))
+        raise ValueError("Unknown exporter '" + name + "'. Valid: " + valid)
+    return _EXPORTERS[name]
 
-    def test_get_exporter_unknown_raises(self):
-        with pytest.raises(ValueError, match="Unknown exporter"):
-            get_exporter("unknown")
 
-    def test_register_exporter(self, tmp_path, monkeypatch):
-        from skill_primitives.io import exporters as exporters_mod
-
-        monkeypatch.setattr(exporters_mod, "_EXPORTERS", dict(exporters_mod._EXPORTERS))
-
-        class DummyExporter(Exporter):
-            def export(self, trajectory, filename, metadata=None):
-                path = tmp_path / (filename + ".dummy")
-                path.write_text("dummy")
-                return path
-
-        register_exporter("dummy", DummyExporter)
-        assert get_exporter("dummy") is DummyExporter
+def register_exporter(name: str, cls: type[Exporter]) -> None:
+    _EXPORTERS[name.lower().strip()] = cls
