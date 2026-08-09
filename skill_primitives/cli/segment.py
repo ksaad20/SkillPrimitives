@@ -6,7 +6,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Sequence
+from typing import Any, Sequence
 
 from skill_primitives.core.segmenter import Segmenter
 from skill_primitives.io.lerobot_adapter import LeRobotAdapter
@@ -59,7 +59,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     return 0
 
 
-def _visualize_segments(segments: list[dict], path: Path) -> None:
+def _visualize_segments(segments: list[dict[str, Any]], path: Path) -> None:
     """Create a simple visualization of detected segments."""
     try:
         import matplotlib.pyplot as plt
@@ -71,19 +71,19 @@ def _visualize_segments(segments: list[dict], path: Path) -> None:
         return
 
     fig, ax = plt.subplots(figsize=(10, 3))
-    
+    colors = {
+        "reach": "blue",
+        "grasp": "green",
+        "lift": "orange",
+        "transport": "purple",
+        "place": "red",
+    }
+
     for seg in segments:
-       colors = {
-         "reach": "blue",
-         "grasp": "green",
-         "lift": "orange",
-         "transport": "purple",
-         "place": "red",
-     }
-        
-    ax.barh(seg["type"], seg["end"] - seg["start"], left=seg["start"], color=color, alpha=0.6)
+        color = colors.get(seg["type"], "gray")
+        ax.barh(seg["type"], seg["end"] - seg["start"], left=seg["start"], color=color, alpha=0.6)
+
     ax.set_xlabel("Frame")
-    
     ax.set_title("Detected Skill Primitives")
     plt.tight_layout()
     plt.savefig(path)
