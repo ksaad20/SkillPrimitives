@@ -93,7 +93,7 @@ jobs:
       url: https://pypi.org/p/skill-primitives
     steps:
       - name: Download distributions
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: dist
           path: dist/
@@ -115,7 +115,7 @@ jobs:
           fetch-depth: 0           # Full history for changelog generation
 
       - name: Download distributions
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: dist
           path: dist/
