@@ -52,9 +52,7 @@ class LeRobotAdapter(BaseAdapter):
                 "The 'datasets' library is required. " "Install with: pip install datasets"
             ) from err
 
-        ds: Dataset = load_dataset(
-            dataset_path, split="train", streaming=False, revision=revision
-        )
+        ds: Dataset = load_dataset(dataset_path, split="train", streaming=False, revision=revision)
         # Filter to specific episode
         if "episode_index" in ds.column_names:
             episode_data = ds.filter(lambda x: x["episode_index"] == episode_index)
@@ -161,9 +159,7 @@ class LeRobotAdapter(BaseAdapter):
                 "The 'datasets' library is required. " "Install with: pip install datasets"
             ) from err
 
-        ds: Dataset = load_dataset(
-            dataset_path, split="train", streaming=False, revision=revision
-        )
+        ds: Dataset = load_dataset(dataset_path, split="train", streaming=False, revision=revision)
 
         if "episode_index" in ds.column_names:
             episodes = sorted(set(ds["episode_index"]))
