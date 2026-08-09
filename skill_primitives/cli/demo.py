@@ -1,3 +1,5 @@
+"""CLI demo command for skill primitives."""
+
 from __future__ import annotations
 
 import json
@@ -6,6 +8,7 @@ import tempfile
 from skill_primitives.core.annotator import Annotator
 from skill_primitives.core.composer import compose
 from skill_primitives.core.segmenter import Segmenter
+from skill_primitives.io.lerobot_adapter import LeRobotAdapter
 
 
 def main() -> None:
@@ -21,7 +24,12 @@ def main() -> None:
     print("      Episode: 0")
 
     try:
-        primitives = Segmenter("lerobot/pusht", episode=0)
+        adapter = LeRobotAdapter()
+        segmenter = Segmenter()
+        episode = adapter.load_lerobot_episode(
+            "lerobot/pusht", episode=0, revision="main"
+        )
+        primitives = segmenter.segment(episode)
         source = "live"
     except Exception as e:
         print(f"      Note: Using synthetic fallback ({e})")
