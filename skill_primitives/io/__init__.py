@@ -4,7 +4,7 @@ from skill_primitives.io.exporters import (
     ROS2Exporter,
 )
 from skill_primitives.io.importers import (
-    import_csv,
+    import_data,
     import_hdf5,
     import_numpy,
 )
