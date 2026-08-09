@@ -19,12 +19,16 @@ class BaseAdapter(ABC):
     """
 
     @abstractmethod
-    def load_episode(self, dataset_path: str, episode_index: int) -> dict[str, Any]:
+    def load_episode(
+        self, dataset_path: str, episode_index: int = 0, *, revision: str
+    ) -> dict[str, Any]:
         """Load a single episode as a standardized dict.
 
         Args:
             dataset_path: Path or identifier for the dataset.
             episode_index: Episode index to load.
+            revision: Specific git revision (commit hash or tag) to pin
+                the dataset version. Required for reproducibility.
 
         Returns:
             Standardized episode dict with keys:
@@ -39,30 +43,36 @@ class BaseAdapter(ABC):
         ...
 
     @abstractmethod
-    def list_episodes(self, dataset_path: str) -> list[int]:
+    def list_episodes(self, dataset_path: str, *, revision: str) -> list[int]:
         """Return a list of available episode indices.
 
         Args:
             dataset_path: Path or identifier for the dataset.
+            revision: Specific git revision (commit hash or tag) to pin
+                the dataset version. Required for reproducibility.
 
         Returns:
             List of episode index integers.
         """
         ...
 
-    def load_all_episodes(self, dataset_path: str) -> list[dict[str, Any]]:
+    def load_all_episodes(
+        self, dataset_path: str, *, revision: str
+    ) -> list[dict[str, Any]]:
         """Load all episodes from a dataset.
 
         Convenience method that calls load_episode for each available index.
 
         Args:
             dataset_path: Path or identifier for the dataset.
+            revision: Specific git revision (commit hash or tag) to pin
+                the dataset version. Required for reproducibility.
 
         Returns:
             List of episode dicts.
         """
-        indices = self.list_episodes(dataset_path)
-        return [self.load_episode(dataset_path, idx) for idx in indices]
+        indices = self.list_episodes(dataset_path, revision=revision)
+        return [self.load_episode(dataset_path, idx, revision=revision) for idx in indices]
 
 
 class BaseExporter(ABC):
@@ -92,4 +102,4 @@ class BaseExporter(ABC):
             tasks: List of composed task dicts.
             path: Output file path.
         """
-        raise NotImplementedError("Batch export not supported by this exporter")
+        raise NotImplementedError("Batch export not supported by this exporter.")
