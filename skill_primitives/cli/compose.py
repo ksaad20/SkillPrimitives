@@ -101,5 +101,3 @@ def main(argv: Any = None) -> None:
 
 if __name__ == "__main__":
     main()
-
-return 0
