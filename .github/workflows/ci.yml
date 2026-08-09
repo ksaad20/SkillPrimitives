@@ -80,6 +80,8 @@ jobs:
           pip install -e ".[dev]"
 
       - name: Build zoo artifacts
+        env:
+          PYTHONIOENCODING: utf-8
         run: python script/build_zoo.py
 
       - name: Verify manifest exists
