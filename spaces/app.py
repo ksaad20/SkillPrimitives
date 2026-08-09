@@ -85,9 +85,7 @@ def compose_task(instructions_text: str) -> tuple[str, str]:
     Returns:
         Tuple of (markdown output, JSON export).
     """
-    instructions = [
-        line.strip() for line in instructions_text.splitlines() if line.strip()
-    ]
+    instructions = [line.strip() for line in instructions_text.splitlines() if line.strip()
 
     if not instructions:
         return "Please enter at least one instruction.", "{}"
