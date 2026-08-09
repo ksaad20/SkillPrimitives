@@ -249,9 +249,9 @@ class Segmenter:
             lift_start = search_start + int(np.argmax(positive_z))
             negative_after = np.where(z_vel[int(np.argmax(positive_z)) :] <= 0.01)[0]
             if len(negative_after) > 0:
-    lift_end = lift_start + int(negative_after[0])
-else:
-    lift_end = search_end
+                lift_end = lift_start + int(negative_after[0])
+            else:
+                lift_end = search_end
 
             if np.mean(gripper[lift_start:lift_end]) < 0.6:
                 segments.append(
