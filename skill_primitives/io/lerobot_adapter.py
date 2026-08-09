@@ -36,7 +36,7 @@ class LeRobotAdapter(BaseAdapter):
         Returns:
             Standardized episode dict.
         """
-                try:
+        try:
             from datasets import load_dataset
         except ImportError as err:
             raise ImportError(
