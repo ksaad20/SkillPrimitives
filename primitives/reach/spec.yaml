@@ -1,8 +1,0 @@
-name: reach
-version: "0.0.1"
-category: interaction
-description: Reach toward a target object in 3D space.
-author: ksaad20
-files:
-  - src: reach.py
-    dest: reach.py
