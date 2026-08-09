@@ -71,16 +71,15 @@ def _visualize_segments(segments: list[dict], path: Path) -> None:
         return
 
     fig, ax = plt.subplots(figsize=(10, 3))
-    colors = {"reach": "blue", "grasp": "green", "lift": "orange", "transport": "purple", "place": "red"}
-
     for seg in segments:
-        colors = {
-         "reach": "blue",
-         "grasp": "green",
-         "lift": "orange",
-         "transport": "purple",
-         "place": "red",
-     }
+     colors = {
+       "reach": "blue",
+       "grasp": "green",
+       "lift": "orange",
+       "transport": "purple",
+       "place": "red",
+   }
+        
     ax.barh(seg["type"], seg["end"] - seg["start"], left=seg["start"], color=color, alpha=0.6)
 
     ax.set_xlabel("Frame")
