@@ -198,7 +198,7 @@ jobs:
           pip install -e ".[dev]"
 
       - name: Run release checklist
-        run: python scripts/release_checklist.py --strict
+        run: python script/release_checklist.py --strict
 
   # ── Debug: tmate session (manual trigger only) ────────────────────────────
   debug:
