@@ -1,6 +1,5 @@
 """Tests for the skill composer."""
 
-
 from skill_primitives.core.composer import ComposedTask, SkillLibrary, compose
 
 
