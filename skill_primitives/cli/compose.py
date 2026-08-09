@@ -86,7 +86,7 @@ def main(argv: Any = None) -> None:
         "estimated_duration": task.duration,
     }
 
-    exporter = get_exporter()
+    exporter = get_exporter(json)
     exporter.export(task_dict, str(output_path))
 
     print("")
