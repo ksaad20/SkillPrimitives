@@ -7,6 +7,7 @@ from skill_primitives.core.annotator import Annotator
 from skill_primitives.core.composer import compose
 from skill_primitives.core.segmenter import Segmenter
 
+
 def main() -> None:
     print("=" * 60)
     print("  Skill Primitives — Hello Demo")
