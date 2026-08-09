@@ -163,7 +163,9 @@ class TestExporterRegistry:
     def test_register_exporter(self, tmp_path, monkeypatch):
         from skill_primitives.io import exporters as exporters_mod
 
-        monkeypatch.setattr(exporters_mod, "_EXPORTERS", dict(exporters_mod._EXPORTERS))
+        monkeypatch.setattr(
+            exporters_mod, "_EXPORTERS", dict(exporters_mod._EXPORTERS)
+        )
 
         class DummyExporter(Exporter):
             def export(self, trajectory, filename, metadata=None):
