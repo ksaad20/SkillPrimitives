@@ -379,11 +379,11 @@ import json
 import tempfile
 from pathlib import Path
 
-from skill_primitives import segment_episode, compose, SkillLibrary, Primitive
+from skill_primitives import Segmenter, compose, SkillLibrary, Primitive
 
 
 def test_segment_episode_returns_primitives():
-    result = segment_episode("lerobot/pusht", episode=0)
+    result = Segmenter("lerobot/pusht", episode=0)
     assert isinstance(result, list)
     assert len(result) >= 1
     assert all(isinstance(p, Primitive) for p in result)
