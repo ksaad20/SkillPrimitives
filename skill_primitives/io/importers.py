@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 
 
-def import_data(data: dict[str, Any]) -> list[dict[str, Any]]:
+def import_data(path: str, **kwargs: Any) -> dict[str, Any]:
     """Import a trajectory from a CSV file.
 
     Expected columns (case-insensitive):
@@ -22,10 +22,7 @@ def import_data(data: dict[str, Any]) -> list[dict[str, Any]]:
     Returns:
         Standardized episode dict.
     """
-
-    def import_data(path: str, **kwargs: Any) -> dict[str, Any]:
-
-        df = pd.read_csv(path, **kwargs)
+    df = pd.read_csv(path, **kwargs)
 
     # Normalize column names to lowercase
     df.columns = [c.lower().strip() for c in df.columns]
@@ -36,7 +33,7 @@ def import_data(data: dict[str, Any]) -> list[dict[str, Any]]:
     }
 
     # Extract timestamps
-    for key in ["time", "timestamp", "t"]:
+    for key in ("time", "timestamp", "t"):
         if key in df.columns:
             result["timestamps"] = df[key].values
             break
@@ -51,7 +48,7 @@ def import_data(data: dict[str, Any]) -> list[dict[str, Any]]:
     else:
         # Try to infer state from remaining numeric columns
         numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
-        exclude = ["time", "timestamp", "t", "gripper"]
+        exclude = ("time", "timestamp", "t", "gripper")
         state_cols = [c for c in numeric_cols if c not in exclude]
         if state_cols:
             result["states"] = df[state_cols].values
@@ -110,14 +107,15 @@ def import_hdf5(path: str, dataset_key: str = "trajectory") -> dict[str, Any]:
         import h5py
     except ImportError as err:
         raise ImportError(
-            "h5py is required for HDF5 import. " "Install with: pip install h5py"
+            "h5py is required for HDF5 import. Install with: pip install h5py"
         ) from err
 
     with h5py.File(path, "r") as f:
         if dataset_key not in f:
             available = list(f.keys())
             raise KeyError(
-                f"Dataset '{dataset_key}' not found in {path}. " f"Available keys: {available}"
+                f"Dataset '{dataset_key}' not found in {path}. "
+                f"Available keys: {available}"
             )
 
         data = f[dataset_key]
@@ -185,15 +183,25 @@ def import_numpy(path: str) -> dict[str, Any]:
 
     if "actions" in data:
         result["actions"] = data["actions"]
-        result["action_dim"] = result["actions"].shape[1] if result["actions"].ndim > 1 else 1
+        result["action_dim"] = (
+            result["actions"].shape[1] if result["actions"].ndim > 1 else 1
+        )
     else:
         result["actions"] = np.array([])
         result["action_dim"] = 0
 
-    state_key = "states" if "states" in data else "observations" if "observations" in data else None
+    state_key = (
+        "states"
+        if "states" in data
+        else "observations"
+        if "observations" in data
+        else None
+    )
     if state_key:
         result["states"] = data[state_key]
-        result["state_dim"] = result["states"].shape[1] if result["states"].ndim > 1 else 1
+        result["state_dim"] = (
+            result["states"].shape[1] if result["states"].ndim > 1 else 1
+        )
     else:
         result["states"] = np.array([])
         result["state_dim"] = 0
