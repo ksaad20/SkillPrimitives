@@ -29,6 +29,4 @@ __all__ = [
     "list_primitives",
     "get_all_primitives",
     "register_primitive",
-    "create_detector",
-    "detect_all",
 ]
