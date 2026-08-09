@@ -5,6 +5,7 @@ import tempfile
 
 from skill_primitives.core.annotator import Annotator
 from skill_primitives.core.composer import compose
+from skill_primitives.core.segmenter import Segmenter
 
 def main() -> None:
     print("=" * 60)
@@ -19,7 +20,7 @@ def main() -> None:
     print("      Episode: 0")
 
     try:
-        primitives = segment_episode("lerobot/pusht", episode=0)
+        primitives = segmenter("lerobot/pusht", episode=0)
         source = "live"
     except Exception as e:
         print(f"      Note: Using synthetic fallback ({e})")
