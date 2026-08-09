@@ -5,7 +5,7 @@ from typing import Any
 import numpy as np
 
 
-def import_csv(path: str, **kwargs: Any) -> dict[str, Any]:
+def import_data(data: dict[str, Any]) -> list[dict[str, Any]]:
     """Import a trajectory from a CSV file.
 
     Expected columns (case-insensitive):
