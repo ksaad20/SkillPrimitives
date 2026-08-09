@@ -1,129 +1,62 @@
+"""CLI command to segment LeRobot episodes into skill primitives."""
+
 from __future__ import annotations
 
 import argparse
-import json
+import sys
 from pathlib import Path
-from typing import Any
+from typing import Sequence
 
-from skill_primitives.core.annotator import Annotator
-from skill_primitives.core.segmenter import segment_episode
+from skill_primitives.core.segmenter import Segmenter
 from skill_primitives.io.lerobot_adapter import LeRobotAdapter
 
 
-def main(argv: Any = None) -> None:
-    parser = argparse.ArgumentParser(
-        description="Segment LeRobot episodes into skill primitives",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog=(
-            "Examples:\n"
-            "  %(prog)s --dataset lerobot/pusht --output ./my_skills/\n"
-            "  %(prog)s --dataset lerobot/pusht --episodes 0 1 2 --output ./my_skills/\n"
-            "  %(prog)s --dataset lerobot/pusht --annotate --provider ollama --output ./my_skills/"
-        ),
-    )
+def main(argv: Sequence[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="Segment LeRobot episodes into skill primitives")
+    parser.add_argument("dataset", help="HuggingFace dataset ID (e.g., lerobot/pusht)")
     parser.add_argument(
-        "--dataset",
+        "--output-dir", "-o", type=Path, default=Path("segments"), help="Output directory"
+    )
+    parser.add_argument("--episode", "-e", type=int, default=0, help="Episode index to segment")
+    parser.add_argument(
+        "--revision",
+        "-r",
+        type=str,
         required=True,
-        help="HuggingFace dataset ID (e.g., lerobot/pusht)",
+        help="Git revision (commit hash or tag) to pin the dataset version",
     )
-    parser.add_argument(
-        "--output",
-        required=True,
-        help="Output directory for segmented skills",
-    )
-    parser.add_argument(
-        "--episodes",
-        type=int,
-        nargs="+",
-        default=None,
-        help="Episode indices to segment (default: all)",
-    )
-    parser.add_argument(
-        "--annotate",
-        action="store_true",
-        help="Annotate segments with natural language descriptions",
-    )
-    parser.add_argument(
-        "--provider",
-        default="ollama",
-        choices=["ollama", "groq", "openai"],
-        help="LLM provider for annotation (default: ollama)",
-    )
-    parser.add_argument(
-        "--model",
-        default="llama3.1",
-        help="Model name for the provider",
-    )
-    parser.add_argument(
-        "--format",
-        default="json",
-        choices=["json", "yaml"],
-        help="Metadata output format (default: json)",
-    )
+    parser.add_argument("--visualize", "-v", action="store_true", help="Generate visualization")
     args = parser.parse_args(argv)
 
-    out_dir = Path(args.output)
-    out_dir.mkdir(parents=True, exist_ok=True)
+    adapter = LeRobotAdapter()
+    segmenter = Segmenter()
 
-    # Determine episodes to process
-    if args.episodes:
-        episodes = args.episodes
-    else:
-        try:
-            adapter = LeRobotAdapter()
-            episodes = adapter.list_episodes(args.dataset)
-            print(f"Found {len(episodes)} episodes in {args.dataset}")
-        except Exception as e:
-            print(f"Could not list episodes: {e}")
-            print("Falling back to episode 0 only")
-            episodes = [0]
+    episodes = adapter.list_episodes(args.dataset, revision=args.revision)
+    print(f"Dataset has {len(episodes)} episode(s): {episodes}")
 
-    annotator = None
-    if args.annotate:
-        annotator = Annotator(provider=args.provider, model=args.model)
+    if args.episode not in episodes:
+        print(f"Error: episode {args.episode} not found.", file=sys.stderr)
+        return 1
 
-    total_segments = 0
+    episode = adapter.load_episode(args.dataset, args.episode, revision=args.revision)
+    print(f"Loaded episode {args.episode} with {episode['num_frames']} frames")
 
-    for ep_idx in episodes:
-        print("")
-        print(f"Processing episode {ep_idx}...")
+    segments = segmenter.segment(episode)
+    print(f"Segmented into {len(segments)} skill primitive(s)")
 
-        try:
-            primitives = segment_episode(args.dataset, episode=ep_idx)
-        except Exception as e:
-            print(f"  Failed to segment episode {ep_idx}: {e}")
-            continue
+    args.output_dir.mkdir(parents=True, exist_ok=True)
+    for i, seg in enumerate(segments):
+        out_path = args.output_dir / f"segment_{i:03d}.json"
+        segmenter.save_segment(seg, out_path)
+        print(f"  Saved {out_path}")
 
-        print(f"  Found {len(primitives)} primitives")
+    if args.visualize:
+        viz_path = args.output_dir / "visualization.png"
+        segmenter.visualize(segments, viz_path)
+        print(f"  Visualization saved to {viz_path}")
 
-        # Annotate if requested
-        if annotator:
-            primitives = annotator.annotate_batch(primitives)
-
-        # Write segments to disk
-        for i, primitive in enumerate(primitives):
-            ptype = primitive["type"]
-            pdir = out_dir / ptype
-            pdir.mkdir(exist_ok=True)
-
-            # Write metadata
-            meta_path = pdir / f"episode_{ep_idx:03d}_seg_{i:03d}.json"
-            with open(meta_path, "w") as f:
-                json.dump(primitive, f, indent=2)
-
-            total_segments += 1
-
-    print("")
-    print("{}".format("=" * 50))
-    print("Segmentation complete!")
-    print(f"  Dataset: {args.dataset}")
-    print(f"  Episodes: {len(episodes)}")
-    print(f"  Total segments: {total_segments}")
-    print(f"  Output: {out_dir.absolute()}")
-    print("{}".format("=" * 50))
-
-    return
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
