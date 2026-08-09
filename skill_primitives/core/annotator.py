@@ -74,9 +74,9 @@ class Annotator:
 
                 self._client = ollama
             except ImportError as err:
-                raise ImportError(
-    "OpenAI SDK not installed. Install with: pip install openai"
-) from err
+                                raise ImportError(
+                    "OpenAI SDK not installed. Install with: pip install openai"
+                ) from err
 
         elif self.provider == "groq":
             try:
