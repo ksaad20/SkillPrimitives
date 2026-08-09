@@ -33,17 +33,32 @@ class TestComposer:
         out = tmp_path / "task.json"
         task.export_json(str(out))
         assert out.exists()
-        assert out.read_text().startswith("[")
+        data = json.loads(out.read_text())
+        assert "task" in data
+        assert data["task"]["num_primitives"] == 2
+        assert isinstance(data["task"]["primitives"], list)
 
-    def test_composed_task_export_lerobot_is_stub(self):
+    def test_composed_task_export_lerobot(self, tmp_path):
         task = compose(["reach"])
-        with pytest.raises(NotImplementedError):
-            task.export_lerobot("/tmp/fake.parquet")
+        out = tmp_path / "task.parquet"
+        task.export_lerobot(str(out))
+        assert out.exists()
 
-    def test_skill_library_from_disk_returns_valid_library(self):
-        lib = SkillLibrary.from_disk("/tmp/fake_zoo")
+    def test_skill_library_from_disk_returns_empty_for_missing_path(self):
+        lib = SkillLibrary.from_disk("/tmp/nonexistent_zoo_12345")
         assert isinstance(lib, SkillLibrary)
-        assert "reach" in lib.skills
-        assert "grasp" in lib.skills
-        assert "lift" in lib.skills
-        assert "place" in lib.skills
+        assert lib.skills == []
+
+    def test_skill_library_from_disk_loads_skills(self, tmp_path):
+        import yaml
+
+        zoo = tmp_path / "zoo"
+        reach_dir = zoo / "reach"
+        reach_dir.mkdir(parents=True)
+        meta = {"description": "reach out"}
+        (reach_dir / "metadata.yaml").write_text(yaml.safe_dump(meta))
+
+        lib = SkillLibrary.from_disk(str(zoo))
+        assert isinstance(lib, SkillLibrary)
+        assert len(lib.skills) >= 1
+        assert any(s.skill_type == "reach" for s in lib.skills)
