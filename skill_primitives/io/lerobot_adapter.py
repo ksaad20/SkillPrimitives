@@ -152,4 +152,4 @@ class LeRobotAdapter(BaseAdapter):
             return [int(e) for e in episodes]
         else:
             # Single episode
-            return
+            return[0]
