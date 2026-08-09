@@ -59,10 +59,36 @@ jobs:
       - name: Type check with mypy
         run: mypy skill_primitives
 
-  # ── 2. Test Matrix (comprehensive, parallel) ──────────────────────────────
+  # ── 2. Zoo Build Verification (ensure artifacts generate cleanly) ──────────
+  zoo:
+    name: Zoo Build
+    needs: quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Build zoo artifacts
+        run: python script/build_zoo.py
+
+      - name: Verify manifest exists
+        run: test -f zoo_manifest.json
+
+  # ── 3. Test Matrix (comprehensive, parallel) ──────────────────────────────
   test:
     name: Test
-    needs: [quality, zoo]               # Don't waste matrix time if lint fails
+    needs: quality                 # Don't waste matrix time if lint fails
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false             # See all Python/OS failures, not just first
@@ -89,11 +115,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e ".[dev]"
 
-      - name: Download zoo artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: zoo-artifacts
-          path: zoo/
+      - name: Build zoo artifacts
+        run: python script/build_zoo.py
 
       - name: Run test suite
         run: pytest tests/ -v --cov=skill_primitives --cov-report=xml --cov-report=term
@@ -108,39 +131,6 @@ jobs:
 
       - name: Demo smoke test
         run: python -m skill_primitives.cli.demo
-
-  # ── 3. Zoo Build Verification (ensure artifacts generate cleanly) ──────────
-  zoo:
-    name: Zoo Build
-    needs: quality
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-          cache: 'pip'
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e ".[dev]"
-
-      - name: Build zoo artifacts
-        run: python script/build_zoo.py
-
-      - name: Verify manifest exists
-        run: test -f zoo_manifest.json
-
-      - name: Upload zoo artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: zoo-artifacts
-          path: zoo/
-          retention-days: 7
 
   # ── 4. Package Build & Distribution Check ─────────────────────────────────
   build:
