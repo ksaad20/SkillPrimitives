@@ -5,11 +5,11 @@ title: "Skill Primitives: Natural Language to Robot Motion"
 abstract: "Decompose robotics training datasets into composable skill primitives and annotate them with natural language instructions. Built on LeRobot."
 type: software
 authors:
-  - family-names: "YOUR_LAST_NAME"
-    given-names: "YOUR_FIRST_NAME"
-    orcid: "https://orcid.org/0000-0000-0000-0000"
-repository-code: "https://github.com/YOUR_USERNAME/skill-primitives"
-url: "https://github.com/YOUR_USERNAME/skill-primitives"
+  - family-names: "Kazi"
+    given-names: "Asif"
+    orcid: "https://orcid.org/0000-0003-0560-9117"
+repository-code: "https://github.com/ksaad20/skill-primitives"
+url: "https://github.com/ksaad20/skill-primitives"
 license: Apache-2.0
 date-released: 2026-08-07
 keywords:
