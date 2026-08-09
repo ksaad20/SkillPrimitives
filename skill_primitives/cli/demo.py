@@ -105,7 +105,7 @@ def main() -> None:
     )
     print("=" * 60)
 
-    return
+    return 0
 
 
 if __name__ == "__main__":
