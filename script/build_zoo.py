@@ -29,7 +29,7 @@ console = Console()
 
 # ── Configuration ────────────────────────────────────────────────────────────
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-PRIMITIVES_DIR = PROJECT_ROOT / "primitives"
+PRIMITIVES_DIR = PROJECT_ROOT / "skill_primitives" / "primitives"
 ZOO_DIR = PROJECT_ROOT / "zoo"
 TEMPLATES_DIR = PROJECT_ROOT / "templates"
 META_FILE = PROJECT_ROOT / "zoo_manifest.json"
