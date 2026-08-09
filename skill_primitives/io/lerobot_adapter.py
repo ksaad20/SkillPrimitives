@@ -26,12 +26,21 @@ class LeRobotAdapter(BaseAdapter):
     - observation.image (optional): camera images
     """
 
-    def load_episode(self, dataset_path: str, episode_index: int = 0) -> dict[str, Any]:
+    def load_episode(
+        self,
+        dataset_path: str,
+        episode_index: int = 0,
+        *,
+        revision: str,
+    ) -> dict[str, Any]:
         """Load a single episode from a LeRobot dataset.
 
         Args:
             dataset_path: HuggingFace dataset ID (e.g., "lerobot/pusht").
             episode_index: Episode index to load.
+            revision: Specific git revision (commit hash or tag) to pin the
+                dataset version. **Never use "main"** in production — it is a
+                moving target and creates a supply-chain risk.
 
         Returns:
             Standardized episode dict.
@@ -43,9 +52,9 @@ class LeRobotAdapter(BaseAdapter):
                 "The 'datasets' library is required. " "Install with: pip install datasets"
             ) from err
 
-              ds: Dataset = load_dataset(  # nosec B615
-              dataset_path, split="train", streaming=False, revision="main"
-)
+        ds: Dataset = load_dataset(
+            dataset_path, split="train", streaming=False, revision=revision
+        )
         # Filter to specific episode
         if "episode_index" in ds.column_names:
             episode_data = ds.filter(lambda x: x["episode_index"] == episode_index)
@@ -129,11 +138,18 @@ class LeRobotAdapter(BaseAdapter):
 
         return result
 
-    def list_episodes(self, dataset_path: str) -> list[int]:
+    def list_episodes(
+        self,
+        dataset_path: str,
+        *,
+        revision: str,
+    ) -> list[int]:
         """List available episode indices in a LeRobot dataset.
 
         Args:
             dataset_path: HuggingFace dataset ID.
+            revision: Specific git revision (commit hash or tag) to pin the
+                dataset version. **Never use "main"** in production.
 
         Returns:
             List of episode index integers.
@@ -146,8 +162,8 @@ class LeRobotAdapter(BaseAdapter):
             ) from err
 
         ds: Dataset = load_dataset(
-            dataset_path, split="train", streaming=False, revision="main"
-        )  # nosec B615 - intentionally tracking main branch for latest data
+            dataset_path, split="train", streaming=False, revision=revision
+        )
 
         if "episode_index" in ds.column_names:
             episodes = sorted(set(ds["episode_index"]))
