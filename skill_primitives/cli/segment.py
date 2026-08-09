@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import argparse
+import json
 import sys
-from collections.abc import Sequence
 from pathlib import Path
+from typing import Sequence
 
 from skill_primitives.core.segmenter import Segmenter
 from skill_primitives.io.lerobot_adapter import LeRobotAdapter
@@ -47,15 +48,40 @@ def main(argv: Sequence[str] | None = None) -> int:
     args.output_dir.mkdir(parents=True, exist_ok=True)
     for i, seg in enumerate(segments):
         out_path = args.output_dir / f"segment_{i:03d}.json"
-        segmenter.save_segment(seg, out_path)
+        out_path.write_text(json.dumps(seg, indent=2))
         print(f"  Saved {out_path}")
 
     if args.visualize:
         viz_path = args.output_dir / "visualization.png"
-        segmenter.visualize(segments, viz_path)
+        _visualize_segments(segments, viz_path)
         print(f"  Visualization saved to {viz_path}")
 
     return 0
+
+
+def _visualize_segments(segments: list[dict], path: Path) -> None:
+    """Create a simple visualization of detected segments."""
+    try:
+        import matplotlib.pyplot as plt
+    except ImportError:
+        print("Warning: matplotlib not installed, skipping visualization", file=sys.stderr)
+        return
+
+    if not segments:
+        return
+
+    fig, ax = plt.subplots(figsize=(10, 3))
+    colors = {"reach": "blue", "grasp": "green", "lift": "orange", "transport": "purple", "place": "red"}
+
+    for seg in segments:
+        color = colors.get(seg["type"], "gray")
+        ax.barh(seg["type"], seg["end"] - seg["start"], left=seg["start"], color=color, alpha=0.6)
+
+    ax.set_xlabel("Frame")
+    ax.set_title("Detected Skill Primitives")
+    plt.tight_layout()
+    plt.savefig(path)
+    plt.close(fig)
 
 
 if __name__ == "__main__":
