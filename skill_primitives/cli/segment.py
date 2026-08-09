@@ -6,7 +6,8 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any
+from collections.abc import Sequence
 
 from skill_primitives.core.segmenter import Segmenter
 from skill_primitives.io.lerobot_adapter import LeRobotAdapter
