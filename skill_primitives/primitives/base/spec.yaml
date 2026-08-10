@@ -1,0 +1,7 @@
+name: base
+version: "0.0.1"
+category: base
+author: ksaad20
+files:
+  - primitive.py
+description: Abstract base class for all manipulation primitives.
