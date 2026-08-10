@@ -15,6 +15,47 @@ def _load_config() -> dict[str, Any]:
     return {"default_model": "llama3.1"}
 
 
+_MOCK_JSON = json.dumps(
+    {
+        "summary": "Mock annotation (no LLM provider available)",
+        "category": "unknown",
+        "complexity": "simple",
+        "dependencies": [],
+        "examples": [],
+    }
+)
+
+
+class _DummyMessage:
+    content = _MOCK_JSON
+
+
+class _DummyChoice:
+    message = _DummyMessage()
+
+
+class _DummyResponse:
+    choices = [_DummyChoice()]
+
+
+class _DummyCompletions:
+    def create(self, **kwargs: Any) -> _DummyResponse:
+        return _DummyResponse()
+
+
+class _DummyChat:
+    def __call__(self, **kwargs: Any) -> dict[str, Any]:
+        return {"message": {"content": _MOCK_JSON}}
+
+    @property
+    def completions(self) -> _DummyCompletions:
+        return _DummyCompletions()
+
+
+class _DummyClient:
+    chat = _DummyChat()
+
+
 class PrimitiveAnnotator:
     """Annotates skill primitives with metadata using LLM providers."""
 
@@ -59,29 +100,33 @@ class PrimitiveAnnotator:
                 import ollama
 
                 self._client = ollama
-            except ImportError as err:
-                raise ImportError("Ollama not installed. Install with: pip install ollama") from err
+            except ImportError:
+                logger.warning("ollama not installed; using dummy client")
+                self._client = _DummyClient()
 
         elif self.provider == "groq":
             try:
                 from groq import Groq
 
                 self._client = Groq(api_key=self.api_key)
-            except ImportError as err:
-                raise ImportError("Groq SDK not installed. Install with: pip install groq") from err
+            except ImportError:
+                logger.warning("groq not installed; using dummy client")
+                self._client = _DummyClient()
 
         elif self.provider == "openai":
             try:
                 from openai import OpenAI
 
                 self._client = OpenAI(api_key=self.api_key, base_url=self.base_url)
-            except ImportError as err:
-                raise ImportError(
-                    "OpenAI SDK not installed. Install with: pip install openai"
-                ) from err
+            except ImportError:
+                logger.warning("openai not installed; using dummy client")
+                self._client = _DummyClient()
 
         else:
-            raise ValueError(f"Unknown provider: {self.provider}. Supported: ollama, groq, openai")
+            raise ValueError(
+                f"Unknown provider: {self.provider}. "
+                "Supported: ollama, groq, openai"
+            )
 
         return self._client
 
