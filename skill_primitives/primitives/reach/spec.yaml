@@ -1,13 +1,18 @@
 name: reach
+version: "1.0.0"
+category: manipulation
+author: ksaad20
+files:
+  - reach.py
 description: Arm moves toward target object with gripper open.
 
 detection:
   strategy: motion_toward_target_with_open_gripper
   preconditions:
-    gripper_state: open      # gripper[t] >= 0.4
+    gripper_state: open
   anchor:
-    event: grasp_transition  # gripper[t-1] >= 0.5 → gripper[t] < 0.5
-    search_window: 20        # frames before grasp to search
+    event: grasp_transition
+    search_window: 20
   parameters:
     peak_velocity_threshold: 0.005
     min_open_gripper_frames: 5
@@ -18,7 +23,7 @@ detection:
   confidence: 0.88
 
 constraints:
-  temporal_order: []         # typically first primitive
+  temporal_order: []
   must_precede: [grasp]
   gripper_must_remain: open
 
