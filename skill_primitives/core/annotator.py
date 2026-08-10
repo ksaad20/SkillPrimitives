@@ -6,7 +6,6 @@ import json
 import os
 from typing import Any, cast
 
-from skill_primitives.core.base import SkillPrimitive
 from skill_primitives.core.registry import PrimitiveRegistry
 from skill_primitives.utils.config import load_config
 from skill_primitives.utils.logging import get_logger
@@ -31,13 +30,13 @@ class PrimitiveAnnotator:
         self._client: Any = None
         self._config = load_config()
 
-    def annotate(self, primitive: SkillPrimitive) -> dict[str, Any]:
+    def annotate(self, primitive: dict[str, Any]) -> dict[str, Any]:
         """Annotate a single primitive with metadata."""
         prompt = self._build_prompt(primitive)
         response = self._call_llm(prompt)
         return self._parse_response(response)
 
-    def annotate_batch(self, primitives: list[SkillPrimitive]) -> list[dict[str, Any]]:
+    def annotate_batch(self, primitives: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """Annotate multiple primitives."""
         return [self.annotate(p) for p in primitives]
 
@@ -144,7 +143,7 @@ Annotator = PrimitiveAnnotator
 
 
 def annotate_primitives(
-    primitives: list[SkillPrimitive],
+    primitives: list[dict[str, Any]],
     provider: str = "ollama",
     model: str | None = None,
     api_key: str | None = None,
