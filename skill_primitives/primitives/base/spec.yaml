@@ -3,5 +3,5 @@ version: "0.0.1"
 category: base
 author: ksaad20
 files:
-  - src: primitive.py
+  - src: base.py
 description: Abstract base class for all manipulation primitives.
