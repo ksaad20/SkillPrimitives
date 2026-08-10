@@ -60,9 +60,7 @@ class PrimitiveAnnotator:
 
                 self._client = ollama
             except ImportError as err:
-                raise ImportError(
-                    "Ollama not installed. Install with: pip install ollama"
-                ) from err
+                raise ImportError("Ollama not installed. Install with: pip install ollama") from err
 
         elif self.provider == "groq":
             try:
@@ -70,9 +68,7 @@ class PrimitiveAnnotator:
 
                 self._client = Groq(api_key=self.api_key)
             except ImportError as err:
-                raise ImportError(
-                    "Groq SDK not installed. Install with: pip install groq"
-                ) from err
+                raise ImportError("Groq SDK not installed. Install with: pip install groq") from err
 
         elif self.provider == "openai":
             try:
@@ -85,9 +81,7 @@ class PrimitiveAnnotator:
                 ) from err
 
         else:
-            raise ValueError(
-                f"Unknown provider: {self.provider}. Supported: ollama, groq, openai"
-            )
+            raise ValueError(f"Unknown provider: {self.provider}. Supported: ollama, groq, openai")
 
         return self._client
 
