@@ -104,7 +104,7 @@ class ZooBuilder:
         return spec
 
     # ── Build ──────────────────────────────────────────────────────────────────
-    def build_primitive(self, primitive_dir: Path, spec: dict) -> dict:
+        def build_primitive(self, primitive_dir: Path, spec: dict) -> dict:
         """Build a single primitive into the zoo."""
         name = primitive_dir.name
         output_dir = self.zoo_dir / name
@@ -132,7 +132,6 @@ class ZooBuilder:
                 f.write(rendered)
 
         # Generate metadata artifact
-        # Generate metadata artifact
         meta = {
             "name": name,
             "version": spec["version"],
@@ -142,10 +141,10 @@ class ZooBuilder:
             "files": [f.get("dest", f["src"]) for f in spec.get("files", [])],
             "built_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         }
-             with open(output_dir / "metadata.yaml", "w", encoding="utf-8") as f:
-                 yaml.dump(meta, f, default_flow_style=False, sort_keys=False)
+        with open(output_dir / "metadata.yaml", "w", encoding="utf-8") as f:
+            yaml.dump(meta, f, default_flow_style=False, sort_keys=False)
 
-             return meta
+        return meta
 
     # ── Orchestration ──────────────────────────────────────────────────────────
     def build(self, names: Optional[set[str]] = None) -> bool:
