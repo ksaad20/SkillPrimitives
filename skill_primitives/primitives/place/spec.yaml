@@ -1,8 +1,35 @@
-name: reach
+name: place
 version: "0.0.1"
-category: interaction
-description: Reach toward a target object in 3D space.
+category: manipulation
 author: ksaad20
 files:
-  - src: reach.py
-    dest: reach.py
+  - place.py
+description: Object is lowered and gripper opens to release.
+
+detection:
+  strategy: gripper_opening_transition
+  preconditions:
+    gripper_state: closed
+  transition:
+    to: open
+  parameters:
+    pre_window: 3
+    post_window: 5
+  state_requirements:
+    velocity: true
+    gripper: true
+  confidence:
+    base: 0.88
+    with_downward_z: 0.95
+    with_low_z: 0.92
+
+constraints:
+  temporal_order: [grasp, lift, transport]
+  gripper_must_end: open
+
+natural_language:
+  templates:
+    - "place the object gently"
+    - "place {object} down"
+    - "release {object}"
+    - "set {object} down gently"
