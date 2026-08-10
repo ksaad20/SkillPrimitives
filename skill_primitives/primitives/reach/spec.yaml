@@ -3,7 +3,7 @@ version: "0.0.1"
 category: manipulation
 author: ksaad20
 files:
-  - reach.py
+  - src: reach.py
 description: Arm moves toward target object with gripper open.
 
 detection:
