@@ -1,10 +1,15 @@
 name: lift
+version: "1.0.0"
+category: manipulation
+author: ksaad20
+files:
+  - lift.py
 description: Object is lifted vertically while secured by gripper.
 
 detection:
   strategy: sustained_positive_z_velocity
   preconditions:
-    gripper_state: closed    # gripper[t] < 0.5
+    gripper_state: closed
   parameters:
     z_velocity_threshold: 0.005
     min_duration_frames: 3
@@ -14,7 +19,6 @@ detection:
   confidence: 0.90
 
 constraints:
-  # Must occur after grasp, before place/transport
   temporal_order: [grasp]
   gripper_must_remain: closed
 
