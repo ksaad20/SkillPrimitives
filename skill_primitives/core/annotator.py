@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import os
-from typing import Any
+from typing import Any, cast
 
 from skill_primitives.core.base import SkillPrimitive
 from skill_primitives.core.registry import PrimitiveRegistry
@@ -110,7 +110,7 @@ Provide output as JSON with these fields:
                 model=model,
                 messages=[{"role": "user", "content": prompt}],
             )
-            return response["message"]["content"]
+            return cast(str, response["message"]["content"])
 
         elif self.provider in ("groq", "openai"):
             response = client.chat.completions.create(
@@ -118,7 +118,7 @@ Provide output as JSON with these fields:
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.1,
             )
-            return response.choices[0].message.content
+            return cast(str, response.choices[0].message.content)
 
         raise ValueError(f"Unsupported provider: {self.provider}")
 
@@ -133,7 +133,22 @@ Provide output as JSON with these fields:
             else:
                 json_str = response.strip()
 
-            return json.loads(json_str)
+            return cast(dict[str, Any], json.loads(json_str))
         except (json.JSONDecodeError, IndexError) as err:
             logger.warning(f"Failed to parse LLM response as JSON: {err}")
             return {"raw_response": response, "parse_error": str(err)}
+
+
+# Backward-compatible aliases for mypy and import compatibility
+Annotator = PrimitiveAnnotator
+
+
+def annotate_primitives(
+    primitives: list[SkillPrimitive],
+    provider: str = "ollama",
+    model: str | None = None,
+    api_key: str | None = None,
+) -> list[dict[str, Any]]:
+    """Convenience function to annotate a list of primitives."""
+    annotator = PrimitiveAnnotator(provider=provider, model=model, api_key=api_key)
+    return annotator.annotate_batch(primitives)
