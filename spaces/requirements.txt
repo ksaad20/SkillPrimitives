@@ -3,7 +3,7 @@
 # Generated from spaces/app.py imports + skill_primitives runtime deps
 
 # Core Gradio dependency for the HF Space UI
-gradio>=4.0,<6.0
+gradio>=6.22.0,<7.0
 
 # skill_primitives runtime dependencies
 numpy>=1.24
