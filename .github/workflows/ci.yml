@@ -26,6 +26,7 @@ permissions:
 env:
   FORCE_COLOR: "1"              # Rich/colored output in logs
   PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  PYTHONIOENCODING: "utf-8"
 
 jobs:
   # ── 1. Lint & Type Check (fast feedback, single runner) ───────────────────
