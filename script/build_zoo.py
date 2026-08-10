@@ -13,6 +13,7 @@ Usage:
 
 import argparse
 import json
+import os
 import shutil
 import sys
 import time
@@ -158,9 +159,17 @@ class ZooBuilder:
 
         self.zoo_dir.mkdir(parents=True, exist_ok=True)
 
-        with Progress(
+        # Skip Unicode spinner in CI to avoid Windows console crashes
+        is_ci = os.environ.get("CI") == "true"
+        progress_columns = [
             SpinnerColumn(),
             TextColumn("[progress.description]{task.description}"),
+        ]
+        if is_ci:
+            progress_columns = [TextColumn("[progress.description]{task.description}")]
+
+        with Progress(
+            *progress_columns,
             console=console,
         ) as progress:
             task = progress.add_task("Building primitives...", total=len(primitives))
