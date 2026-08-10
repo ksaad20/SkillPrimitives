@@ -1,8 +1,32 @@
-name: reach
-version: "0.0.1"
-category: interaction
-description: Reach toward a target object in 3D space.
-author: ksaad20
-files:
-  - src: reach.py
-    dest: reach.py
+name: grasp
+description: Gripper closes to secure an object.
+
+detection:
+  strategy: gripper_closing_transition
+  preconditions:
+    gripper_state: open      # gripper[t-1] >= 0.5
+  transition:
+    to: closed               # gripper[t] < 0.5
+  parameters:
+    pre_window: 3            # frames before closure
+    post_window: 5           # frames after closure
+  post_condition:
+    gripper_state: closed
+    verification_window: 5
+    mean_threshold: 0.6
+  state_requirements:
+    gripper: true
+  confidence:
+    base: 0.75
+    with_post_closure_verification: 0.92
+
+constraints:
+  temporal_order: [reach]
+  gripper_must_end: closed
+
+natural_language:
+  templates:
+    - "grasp the object firmly"
+    - "grasp {object}"
+    - "pick up {object}"
+    - "grab {object}"
