@@ -3,7 +3,7 @@ version: "0.0.1"
 category: manipulation
 author: ksaad20
 files:
-  - grasp.py
+  - src: grasp.py
 description: Gripper closes to secure an object.
 
 detection:
