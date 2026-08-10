@@ -1,71 +1,59 @@
+"""Core annotation logic for SkillPrimitives."""
+
 from __future__ import annotations
 
+import json
 import os
-from typing import TYPE_CHECKING, Any, cast
+from typing import Any
 
-if TYPE_CHECKING:
-    import ollama
+from skill_primitives.core.base import SkillPrimitive
+from skill_primitives.core.registry import PrimitiveRegistry
+from skill_primitives.utils.config import load_config
+from skill_primitives.utils.logging import get_logger
 
-try:
-    import ollama
-except ImportError:
-    ollama = None
+logger = get_logger(__name__)
 
 
-class Annotator:
-    """Annotate primitives with natural language descriptions.
-
-    Supports multiple LLM providers:
-    - "ollama": Local models via Ollama (default, no API key needed)
-    - "groq": Groq API (fast, requires GROQ_API_KEY)
-    - "openai": OpenAI API (requires OPENAI_API_KEY)
-
-    Falls back to template-based descriptions if no LLM is available.
-    """
-
-    # Default natural language templates for each primitive type
-    TEMPLATES: dict[str, str] = {
-        "reach": "reach toward the target object",
-        "grasp": "grasp the object firmly",
-        "lift": "lift the object vertically",
-        "transport": "transport the object to the destination",
-        "place": "place the object gently",
-    }
+class PrimitiveAnnotator:
+    """Annotates skill primitives with metadata using LLM providers."""
 
     def __init__(
         self,
         provider: str = "ollama",
-        model: str = "llama3.1",
+        model: str | None = None,
         api_key: str | None = None,
         base_url: str | None = None,
     ) -> None:
-        """Initialize the annotator.
-
-        Args:
-            provider: LLM provider name ("ollama", "groq", "openai").
-            model: Model name for the provider.
-            api_key: API key for the provider. If None, reads from env var.
-            base_url: Custom base URL for the API
-                (e.g., local OpenAI-compatible server).
-        """
-        self.provider = provider.lower()
+        self.provider = provider
         self.model = model
-        self.api_key = api_key or self._get_api_key()
+        self.api_key = api_key or os.getenv(f"{provider.upper()}_API_KEY")
         self.base_url = base_url
-        self._client: Any | None = None
+        self._client: Any = None
+        self._config = load_config()
 
-    def _get_api_key(self) -> str | None:
-        """Get API key from environment variable based on provider."""
-        env_vars = {
-            "groq": "GROQ_API_KEY",
-            "openai": "OPENAI_API_KEY",
-            "ollama": None,
-        }
-        var = env_vars.get(self.provider)
-        return os.environ.get(var) if var else None
+    def annotate(self, primitive: SkillPrimitive) -> dict[str, Any]:
+        """Annotate a single primitive with metadata."""
+        prompt = self._build_prompt(primitive)
+        response = self._call_llm(prompt)
+        return self._parse_response(response)
+
+    def annotate_batch(
+        self, primitives: list[SkillPrimitive]
+    ) -> list[dict[str, Any]]:
+        """Annotate multiple primitives."""
+        return [self.annotate(p) for p in primitives]
+
+    def annotate_from_registry(
+        self, registry: PrimitiveRegistry
+    ) -> dict[str, dict[str, Any]]:
+        """Annotate all primitives in a registry."""
+        results = {}
+        for name, primitive in registry.items():
+            results[name] = self.annotate(primitive)
+        return results
 
     def _get_client(self) -> Any:
-        """Lazy-load the LLM client."""
+        """Initialize and return the LLM client."""
         if self._client is not None:
             return self._client
 
@@ -76,7 +64,7 @@ class Annotator:
                 self._client = ollama
             except ImportError as err:
                 raise ImportError(
-                    "Ollama SDK not installed. Install with: pip install ollama"
+                    "Ollama not installed. Install with: pip install ollama"
                 ) from err
 
         elif self.provider == "groq":
@@ -85,18 +73,13 @@ class Annotator:
 
                 self._client = Groq(api_key=self.api_key)
             except ImportError as err:
-                raise ImportError(
-                    "Groq SDK not installed. Install with: pip install groq"
-                ) from err
+                raise ImportError("Groq SDK not installed. Install with: pip install groq") from err
 
         elif self.provider == "openai":
             try:
                 from openai import OpenAI
 
-                kwargs = {"api_key": self.api_key}
-                if self.base_url:
-                    kwargs["base_url"] = self.base_url
-                self._client = OpenAI(**kwargs)
+                self._client = OpenAI(api_key=self.api_key, base_url=self.base_url)
             except ImportError as err:
                 raise ImportError(
                     "OpenAI SDK not installed. Install with: pip install openai"
@@ -104,133 +87,61 @@ class Annotator:
 
         else:
             raise ValueError(
-                f"Unknown provider: {self.provider}. "
-                "Supported: ollama, groq, openai"
+                f"Unknown provider: {self.provider}. Supported: ollama, groq, openai"
             )
 
         return self._client
 
     def _build_prompt(self, primitive: dict[str, Any]) -> str:
-        """Build a prompt for the LLM to describe a primitive.
+        """Build a prompt for LLM annotation."""
+        return f"""Analyze this skill primitive and provide structured metadata.
 
-        Args:
-            primitive: Dict with at least a 'type' key.
+Primitive Name: {primitive.get("name", "Unknown")}
+Description: {primitive.get("description", "No description provided")}
+Parameters: {json.dumps(primitive.get("parameters", {}), indent=2)}
 
-        Returns:
-            Prompt string for the LLM.
-        """
-        ptype = primitive.get("type", "unknown")
-        start = primitive.get("start", 0)
-        end = primitive.get("end", 0)
-        confidence = primitive.get("confidence", 0.0)
-
-        prompt = f"""You are a robot motion descriptor. Given a robot manipulation primitive, generate a concise natural language command (5-10 words) that a human could use to instruct a robot.
-
-Primitive type: {ptype}
-Frame range: {start} to {end}
-Confidence: {confidence:.2f}
-
-Rules:
-- Use imperative mood (e.g., "reach toward", "grasp firmly")
-- Be specific about the action
-- Keep it under 10 words
-- Do not explain, only output the command
-
-Command:"""
-        return prompt
+Provide output as JSON with these fields:
+- summary: Brief description of what this primitive does
+- category: Functional category (e.g., "data_processing", "api_call", "validation")
+- complexity: "simple", "moderate", or "complex"
+- dependencies: List of other primitives or external resources needed
+- examples: List of usage examples
+"""
 
     def _call_llm(self, prompt: str) -> str:
-        """Call the LLM with a prompt and return the response text.
-
-        Args:
-            prompt: The prompt string.
-
-        Returns:
-            Generated text from the LLM.
-        """
+        """Call the LLM with the given prompt."""
         client = self._get_client()
+        model = self.model or self._config.get("default_model", "llama3.1")
 
         if self.provider == "ollama":
             response = client.chat(
-                model=self.model,
+                model=model,
                 messages=[{"role": "user", "content": prompt}],
-                options={"temperature": 0.3, "num_predict": 30},
             )
-            return cast(str, response.choices[0].message.content)
+            return response["message"]["content"]
 
-        elif self.provider == "groq" or self.provider == "openai":
+        elif self.provider in ("groq", "openai"):
             response = client.chat.completions.create(
-                model=self.model,
+                model=model,
                 messages=[{"role": "user", "content": prompt}],
-                temperature=0.3,
-                max_tokens=30,
+                temperature=0.1,
             )
-            return cast(str, response.choices[0].message.content)
+            return response.choices[0].message.content
 
-        return ""
+        raise ValueError(f"Unsupported provider: {self.provider}")
 
-    def annotate(self, primitive: dict[str, Any]) -> str:
-        """Generate a natural language description for a single primitive.
-
-        Tries LLM first, falls back to template if LLM fails.
-
-        Args:
-            primitive: Dict with at least a 'type' key.
-
-        Returns:
-            Natural language command string.
-        """
-        ptype = primitive.get("type", "unknown")
-
-        # Try LLM annotation
+    def _parse_response(self, response: str) -> dict[str, Any]:
+        """Parse LLM response into structured metadata."""
         try:
-            prompt = self._build_prompt(primitive)
-            description = self._call_llm(prompt)
-            if description:
-                return description
-        except Exception:
-            # LLM failed (not installed, no API key, model not available)
-            pass
+            # Try to extract JSON from markdown code blocks
+            if "```json" in response:
+                json_str = response.split("```json")[1].split("```")[0].strip()
+            elif "```" in response:
+                json_str = response.split("```")[1].split("```")[0].strip()
+            else:
+                json_str = response.strip()
 
-        # Fallback to template
-        return self.TEMPLATES.get(ptype, f"perform {ptype}")
-
-    def annotate_batch(
-        self,
-        primitives: list[dict[str, Any]],
-    ) -> list[dict[str, Any]]:
-        """Annotate a batch of primitives with natural language descriptions.
-
-        Args:
-            primitives: List of primitive dicts.
-
-        Returns:
-            List of primitive dicts with added "description" key.
-        """
-        annotated = []
-        for _i, primitive in enumerate(primitives):
-            desc = self.annotate(primitive)
-            annotated_primitive = dict(primitive)
-            annotated_primitive["description"] = desc
-            annotated.append(annotated_primitive)
-
-        return annotated
-
-
-def annotate_primitives(
-    primitives: list[dict[str, Any]],
-    provider: str = "ollama",
-    model: str = "llama3.1",
-) -> list[dict[str, Any]]:
-    """Convenience function to annotate a list of primitives.
-
-    Args:
-        primitives: List of primitive dicts.
-        provider: LLM provider name.
-        model: Model name.
-
-    Returns:
-        List of annotated primitive dicts.
-    """
-    annotator = Annotator(provider=provider, model=model)
-    return annotator.annotate_batch(primitives)
+            return json.loads(json_str)
+        except (json.JSONDecodeError, IndexError) as err:
+            logger.warning(f"Failed to parse LLM response as JSON: {err}")
+            return {"raw_response": response, "parse_error": str(err)}
