@@ -26,9 +26,7 @@ def main() -> None:
     try:
         adapter = LeRobotAdapter()
         segmenter = Segmenter()
-        episode = adapter.load_episode(
-            "lerobot/pusht", episode_index=0, revision="main"
-        )
+        episode = adapter.load_episode("lerobot/pusht", episode_index=0, revision="main")
         primitives = segmenter.segment(episode)
         source = "live"
     except Exception as e:
@@ -101,12 +99,9 @@ def main() -> None:
     print("=" * 60)
     print("  Demo complete!")
     print("  Try it yourself:")
+    print("    python -m skill_primitives.segment --dataset lerobot/pusht" " --output ./skills/")
     print(
-        '    python -m skill_primitives.segment --dataset lerobot/pusht'
-        " --output ./skills/"
-    )
-    print(
-        '    python -m skill_primitives.compose --library ./skills/'
+        "    python -m skill_primitives.compose --library ./skills/"
         ' --instructions "reach" "grasp" "lift"'
     )
     print("=" * 60)
