@@ -8,7 +8,7 @@ from skill_primitives.core.composer import SkillLibrary, compose
 from skill_primitives.io.exporters import get_exporter
 
 
-def main(argv: Any = None) -> None:
+def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(
         description="Compose skill primitives into tasks from natural language",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -79,8 +79,7 @@ def main(argv: Any = None) -> None:
 
     exporter_cls = get_exporter(args.format)
     exporter = exporter_cls(output_dir=str(output_path.parent))
-    # Prepare task dict for exporter
-    task_dict = {
+    task_dict: dict[str, Any] = {
         "primitives": task.primitives,
         "num_primitives": len(task.skills),
         "estimated_duration": task.duration,
@@ -93,8 +92,6 @@ def main(argv: Any = None) -> None:
     print(f"Task exported to: {output_path.absolute()}")
     print(f"Format: {args.format}")
     print("{}".format("=" * 50))
-
-    return
 
 
 if __name__ == "__main__":
