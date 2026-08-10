@@ -3,7 +3,7 @@ version: "0.0.1"
 category: manipulation
 author: ksaad20
 files:
-  - place.py
+  - src: place.py
 description: Object is lowered and gripper opens to release.
 
 detection:
