@@ -3,7 +3,7 @@ version: "0.0.1"
 category: manipulation
 author: ksaad20
 files:
-  - lift.py
+  - src: lift.py
 description: Object is lifted vertically while secured by gripper.
 
 detection:
