@@ -3,13 +3,16 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 from typing import Any, cast
 
-from skill_primitives.utils.config import load_config
-from skill_primitives.utils.logging import get_logger
+logger = logging.getLogger(__name__)
 
-logger = get_logger(__name__)
+
+def _load_config() -> dict[str, Any]:
+    """Load configuration with sensible defaults."""
+    return {"default_model": "llama3.1"}
 
 
 class PrimitiveAnnotator:
@@ -27,7 +30,7 @@ class PrimitiveAnnotator:
         self.api_key = api_key or os.getenv(f"{provider.upper()}_API_KEY")
         self.base_url = base_url
         self._client: Any = None
-        self._config = load_config()
+        self._config = _load_config()
 
     def annotate(self, primitive: dict[str, Any]) -> dict[str, Any]:
         """Annotate a single primitive with metadata."""
@@ -57,7 +60,9 @@ class PrimitiveAnnotator:
 
                 self._client = ollama
             except ImportError as err:
-                raise ImportError("Ollama not installed. Install with: pip install ollama") from err
+                raise ImportError(
+                    "Ollama not installed. Install with: pip install ollama"
+                ) from err
 
         elif self.provider == "groq":
             try:
@@ -65,7 +70,9 @@ class PrimitiveAnnotator:
 
                 self._client = Groq(api_key=self.api_key)
             except ImportError as err:
-                raise ImportError("Groq SDK not installed. Install with: pip install groq") from err
+                raise ImportError(
+                    "Groq SDK not installed. Install with: pip install groq"
+                ) from err
 
         elif self.provider == "openai":
             try:
@@ -78,7 +85,9 @@ class PrimitiveAnnotator:
                 ) from err
 
         else:
-            raise ValueError(f"Unknown provider: {self.provider}. Supported: ollama, groq, openai")
+            raise ValueError(
+                f"Unknown provider: {self.provider}. Supported: ollama, groq, openai"
+            )
 
         return self._client
 
@@ -123,7 +132,6 @@ Provide output as JSON with these fields:
     def _parse_response(self, response: str) -> dict[str, Any]:
         """Parse LLM response into structured metadata."""
         try:
-            # Try to extract JSON from markdown code blocks
             if "```json" in response:
                 json_str = response.split("```json")[1].split("```")[0].strip()
             elif "```" in response:
