@@ -6,7 +6,6 @@ import json
 import os
 from typing import Any, cast
 
-from skill_primitives.core.registry import PrimitiveRegistry
 from skill_primitives.utils.config import load_config
 from skill_primitives.utils.logging import get_logger
 
@@ -40,9 +39,9 @@ class PrimitiveAnnotator:
         """Annotate multiple primitives."""
         return [self.annotate(p) for p in primitives]
 
-    def annotate_from_registry(self, registry: PrimitiveRegistry) -> dict[str, dict[str, Any]]:
+    def annotate_from_registry(self, registry: Any) -> dict[str, dict[str, Any]]:
         """Annotate all primitives in a registry."""
-        results = {}
+        results: dict[str, dict[str, Any]] = {}
         for name, primitive in registry.items():
             results[name] = self.annotate(primitive)
         return results
