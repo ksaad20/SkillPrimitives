@@ -37,15 +37,11 @@ class PrimitiveAnnotator:
         response = self._call_llm(prompt)
         return self._parse_response(response)
 
-    def annotate_batch(
-        self, primitives: list[SkillPrimitive]
-    ) -> list[dict[str, Any]]:
+    def annotate_batch(self, primitives: list[SkillPrimitive]) -> list[dict[str, Any]]:
         """Annotate multiple primitives."""
         return [self.annotate(p) for p in primitives]
 
-    def annotate_from_registry(
-        self, registry: PrimitiveRegistry
-    ) -> dict[str, dict[str, Any]]:
+    def annotate_from_registry(self, registry: PrimitiveRegistry) -> dict[str, dict[str, Any]]:
         """Annotate all primitives in a registry."""
         results = {}
         for name, primitive in registry.items():
@@ -63,9 +59,7 @@ class PrimitiveAnnotator:
 
                 self._client = ollama
             except ImportError as err:
-                raise ImportError(
-                    "Ollama not installed. Install with: pip install ollama"
-                ) from err
+                raise ImportError("Ollama not installed. Install with: pip install ollama") from err
 
         elif self.provider == "groq":
             try:
@@ -86,9 +80,7 @@ class PrimitiveAnnotator:
                 ) from err
 
         else:
-            raise ValueError(
-                f"Unknown provider: {self.provider}. Supported: ollama, groq, openai"
-            )
+            raise ValueError(f"Unknown provider: {self.provider}. Supported: ollama, groq, openai")
 
         return self._client
 
