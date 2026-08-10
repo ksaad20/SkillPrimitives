@@ -1,8 +1,30 @@
 name: reach
-version: "0.0.1"
-category: interaction
-description: Reach toward a target object in 3D space.
-author: ksaad20
-files:
-  - src: reach.py
-    dest: reach.py
+description: Arm moves toward target object with gripper open.
+
+detection:
+  strategy: motion_toward_target_with_open_gripper
+  preconditions:
+    gripper_state: open      # gripper[t] >= 0.4
+  anchor:
+    event: grasp_transition  # gripper[t-1] >= 0.5 → gripper[t] < 0.5
+    search_window: 20        # frames before grasp to search
+  parameters:
+    peak_velocity_threshold: 0.005
+    min_open_gripper_frames: 5
+    fallback_confidence: 0.75
+  state_requirements:
+    velocity: true
+    gripper: true
+  confidence: 0.88
+
+constraints:
+  temporal_order: []         # typically first primitive
+  must_precede: [grasp]
+  gripper_must_remain: open
+
+natural_language:
+  templates:
+    - "reach toward the target object"
+    - "reach for {object}"
+    - "move toward {object}"
+    - "approach {object}"
