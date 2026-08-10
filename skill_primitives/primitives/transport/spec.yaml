@@ -3,7 +3,7 @@ version: "0.0.1"
 category: manipulation
 author: ksaad20
 files:
-  - transport.py
+  - src: transport.py
 description: Object is moved horizontally to a new location with gripper closed.
 
 detection:
