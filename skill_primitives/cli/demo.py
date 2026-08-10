@@ -16,6 +16,7 @@ def main() -> None:
     print("  Skill Primitives — Hello Demo")
     print("  Natural Language to Robot Motion")
     print("=" * 60)
+
     # Step 1: Segment
     print("")
     print("[1/4] Segmenting a sample LeRobot episode...")
@@ -100,7 +101,8 @@ def main() -> None:
     print("  Try it yourself:")
     print("    python -m skill_primitives.segment --dataset lerobot/pusht --output ./skills/")
     print(
-        '    python -m skill_primitives.compose --library ./skills/ --instructions "reach" "grasp" "lift"'
+        '    python -m skill_primitives.compose --library ./skills/'
+        ' --instructions "reach" "grasp" "lift"'
     )
     print("=" * 60)
 
