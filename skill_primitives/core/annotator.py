@@ -45,7 +45,8 @@ class Annotator:
             provider: LLM provider name ("ollama", "groq", "openai").
             model: Model name for the provider.
             api_key: API key for the provider. If None, reads from env var.
-            base_url: Custom base URL for the API (e.g., local OpenAI-compatible server).
+            base_url: Custom base URL for the API
+                (e.g., local OpenAI-compatible server).
         """
         self.provider = provider.lower()
         self.model = model
@@ -75,7 +76,7 @@ class Annotator:
                 self._client = ollama
             except ImportError as err:
                 raise ImportError(
-                    "OpenAI SDK not installed. Install with: pip install openai"
+                    "Ollama SDK not installed. Install with: pip install ollama"
                 ) from err
 
         elif self.provider == "groq":
@@ -84,7 +85,9 @@ class Annotator:
 
                 self._client = Groq(api_key=self.api_key)
             except ImportError as err:
-                raise ImportError("Groq SDK not installed. Install with: pip install groq") from err
+                raise ImportError(
+                    "Groq SDK not installed. Install with: pip install groq"
+                ) from err
 
         elif self.provider == "openai":
             try:
@@ -101,7 +104,8 @@ class Annotator:
 
         else:
             raise ValueError(
-                f"Unknown provider: {self.provider}. " "Supported: ollama, groq, openai"
+                f"Unknown provider: {self.provider}. "
+                "Supported: ollama, groq, openai"
             )
 
         return self._client
