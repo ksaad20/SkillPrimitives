@@ -102,8 +102,8 @@ def main() -> None:
     print("  Demo complete!")
     print("  Try it yourself:")
     print(
-        "    python -m skill_primitives.segment"
-        ' --dataset lerobot/pusht --output ./skills/'
+        '    python -m skill_primitives.segment --dataset lerobot/pusht'
+        " --output ./skills/"
     )
     print(
         '    python -m skill_primitives.compose --library ./skills/'
