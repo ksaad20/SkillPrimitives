@@ -104,7 +104,7 @@ class ZooBuilder:
         return spec
 
     # ── Build ──────────────────────────────────────────────────────────────────
-        def build_primitive(self, primitive_dir: Path, spec: dict) -> dict:
+    def build_primitive(self, primitive_dir: Path, spec: dict) -> dict:
         """Build a single primitive into the zoo."""
         name = primitive_dir.name
         output_dir = self.zoo_dir / name
