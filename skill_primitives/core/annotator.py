@@ -123,10 +123,7 @@ class PrimitiveAnnotator:
                 self._client = _DummyClient()
 
         else:
-            raise ValueError(
-                f"Unknown provider: {self.provider}. "
-                "Supported: ollama, groq, openai"
-            )
+            raise ValueError(f"Unknown provider: {self.provider}. " "Supported: ollama, groq, openai")
 
         return self._client
 
