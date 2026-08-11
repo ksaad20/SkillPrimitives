@@ -225,14 +225,12 @@ class ZooBuilder:
         console.print(table)
 
         if self.errors:
-            console.print("
-[bold red]Errors:[/bold red]")
+            console.print("[bold red]Errors:[/bold red]")
             for err in self.errors:
                 console.print(f"  • {err}")
 
         if self.warnings:
-            console.print("
-[bold yellow]Warnings:[/bold yellow]")
+            console.print("[bold yellow]Warnings:[/bold yellow]")
             for warn in self.warnings:
                 console.print(f"  • {warn}")
 
@@ -256,14 +254,12 @@ class ZooBuilder:
                 now = time.time()
                 if now - self.debounce > 1.0:
                     self.debounce = now
-                    console.print(f"
-[yellow]Change detected: {event.src_path}[/yellow]")
+                    console.print(f"[yellow]Change detected: {event.src_path}[/yellow]")
                     self.builder.build()
                     console.rule()
 
-        console.rule("[bold blue]👀 Watch Mode[/bold blue]")
-        console.print("Monitoring primitives/ for changes... (Ctrl+C to stop)
-")
+        console.rule("[bold blue]Watch Mode[/bold blue]")
+        console.print("Monitoring primitives/ for changes... (Ctrl+C to stop)")
 
         self.build()
         handler = RebuildHandler(self)
@@ -276,8 +272,7 @@ class ZooBuilder:
                 time.sleep(1)
         except KeyboardInterrupt:
             observer.stop()
-            console.print("
-[green]Watch mode stopped.[/green]")
+            console.print("[green]Watch mode stopped.[/green]")
         observer.join()
 
 
