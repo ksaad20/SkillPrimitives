@@ -6,6 +6,6 @@ and natural-language description generation.
 
 from __future__ import annotations
 
-from place.place import Place
+from skill_primitives.primitives.place.place import Place
 
 __all__ = ["Place"]
