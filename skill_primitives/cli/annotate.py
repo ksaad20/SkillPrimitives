@@ -1,11 +1,11 @@
-from __future__ import annotations
-
-"""CLI command to annotate skill primitives with natural language."""
-
 import argparse
 import json
 from pathlib import Path
 from typing import Any
+
+from __future__ import annotations
+
+"""CLI command to annotate skill primitives with natural language."""
 
 from skill_primitives.core.annotator import Annotator
 
