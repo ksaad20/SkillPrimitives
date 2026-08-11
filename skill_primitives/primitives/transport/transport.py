@@ -1,8 +1,12 @@
-"""Transport primitive: object moves horizontally with gripper closed."""
+"""transport.py — Object transport primitive between locations.
+
+Detects transport events from demonstration trajectories by identifying
+sustained end-effector motion while the gripper remains closed.
+"""
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, ClassVar
 
 import numpy as np
 
@@ -10,13 +14,25 @@ from skill_primitives.primitives.base import Primitive
 
 
 class Transport(Primitive):
-    """Object is moved horizontally to a new location.
+    """Move the grasped object from one location to another.
 
-    Detected as sustained horizontal motion (xy plane) with
-    gripper closed, between a lift and a place.
+    Detected from sustained end-effector motion while the gripper
+    remains closed.
     """
 
-    name = "transport"
+    # ── Metadata ───────────────────────────────────────────────────────────
+    name: ClassVar[str] = "transport"
+    version: ClassVar[str] = "0.1.0"
+    category: ClassVar[str] = "manipulation"
+    description: ClassVar[str] = "Move the grasped object from one location to another."
+    author: ClassVar[str] = "ksaad20"
+
+    # ── Detection hyperparameters ──────────────────────────────────────────
+    CLOSED_THRESHOLD: ClassVar[float] = 0.5
+    MIN_SPEED_THRESHOLD: ClassVar[float] = 0.005
+    MIN_DURATION: ClassVar[int] = 10
+    PRE_WINDOW: ClassVar[int] = 2
+    POST_WINDOW: ClassVar[int] = 2
 
     def detect(
         self,
@@ -24,49 +40,97 @@ class Transport(Primitive):
         state: np.ndarray | None = None,
         velocity: np.ndarray | None = None,
     ) -> list[dict[str, Any]]:
-        """Detect transport segments: horizontal motion with closed gripper."""
+        """Detect transport segments from closed-gripper motion.
+
+        Args:
+            gripper: 1-D array of normalized gripper openings in [0, 1].
+            state: Optional 2-D array of robot states per timestep.
+            velocity: Optional 2-D array of velocities per timestep.
+
+        Returns:
+            List of segment dicts, each containing ``type``, ``start``,
+            ``end``, and ``confidence``.
+        """
         segments: list[dict[str, Any]] = []
-        if len(gripper) < 3:
+        n = len(gripper)
+        if n < 2:
             return segments
 
-        vel = (
-            velocity
-            if velocity is not None and velocity.size > 0
-            else self._compute_velocity(state or np.array([]))
-        )
-        if vel.size == 0 or vel.shape[1] < 2:
+        speed = self._compute_speed(state, velocity, n)
+        if speed is None:
             return segments
 
-        xy_vel = vel[:, :2]
-        xy_mag = np.linalg.norm(xy_vel, axis=1)
-        min_transport_frames = 3
-        xy_threshold = 0.005
+        closed_mask = gripper < self.CLOSED_THRESHOLD
 
-        t = 0
-        while t < len(xy_mag):
-            # Look for horizontal motion with closed gripper
-            if xy_mag[t] > xy_threshold and gripper[t] < 0.5:
-                start = t
-                while t < len(xy_mag) and xy_mag[t] > xy_threshold and gripper[t] < 0.5:
-                    t += 1
-                end = t
+        i = 0
+        while i < n:
+            if not closed_mask[i]:
+                i += 1
+                continue
 
-                if end - start >= min_transport_frames:
-                    segments.append(
-                        {
-                            "type": self.name,
-                            "start": int(start),
-                            "end": int(end),
-                            "confidence": 0.85,
-                        }
-                    )
-            else:
-                t += 1
+            start = i
+            while i < n and closed_mask[i]:
+                i += 1
+            end = i
+
+            if end - start < self.MIN_DURATION:
+                continue
+
+            mean_speed = float(np.mean(speed[start:end]))
+            if mean_speed >= self.MIN_SPEED_THRESHOLD:
+                confidence = self._compute_confidence(mean_speed)
+                seg_start = max(0, start - self.PRE_WINDOW)
+                seg_end = min(n, end + self.POST_WINDOW)
+                segments.append(
+                    {
+                        "type": self.name,
+                        "start": int(seg_start),
+                        "end": int(seg_end),
+                        "confidence": float(confidence),
+                    }
+                )
 
         return segments
 
+    def _compute_speed(
+        self,
+        state: np.ndarray | None,
+        velocity: np.ndarray | None,
+        n: int,
+    ) -> np.ndarray | None:
+        """Return per-timestep speed, preferring velocity norm over state deltas."""
+        if velocity is not None and velocity.ndim == 2 and velocity.shape[0] == n:
+            speed: np.ndarray = np.linalg.norm(velocity, axis=1)
+            return speed
+        if state is not None and state.ndim == 2 and state.shape[0] == n:
+            deltas = np.diff(state, axis=0, prepend=state[:1])
+            speed = np.linalg.norm(deltas, axis=1)
+            return speed
+        return None
+
+    def _compute_confidence(self, mean_speed: float) -> float:
+        """Higher confidence for faster, clearer transport motion."""
+        if mean_speed > 0.03:
+            return 0.94
+        if mean_speed > 0.015:
+            return 0.86
+        return 0.78
+
     def validate(self, segment: dict[str, Any]) -> bool:
-        return segment.get("type") == self.name
+        """Check segment quality beyond the default type match."""
+        if not super().validate(segment):
+            return False
+
+        duration = segment.get("end", 0) - segment.get("start", 0)
+        if duration <= 0:
+            return False
+
+        confidence = float(segment.get("confidence", 0.0))
+        return confidence >= 0.75
 
     def describe(self, segment: dict[str, Any]) -> str:
-        return "transport the object to the destination"
+        """Generate natural-language description with confidence nuance."""
+        confidence = float(segment.get("confidence", 0.0))
+        if confidence >= 0.9:
+            return "transport the object smoothly"
+        return "transport the object"
