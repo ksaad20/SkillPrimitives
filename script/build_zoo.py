@@ -127,7 +127,7 @@ class ZooBuilder:
             template = self.env.get_template(template_name)
             rendered = template.render(
                 primitive=spec,
-                name=name,
+                name=name, ft
                 files=spec.get("files", []),
             )
             out_file = output_dir / spec.get("template_output", "index.html")
@@ -142,8 +142,8 @@ class ZooBuilder:
             "description": spec["description"],
             "author": spec["author"],
             "files": [
-                f if isinstance(f, str) else f.get("dest", f["src"])
-                for f in spec.get("files", [])
+                f if isinstance(f, str) else f.get("dest", f["src"]) for f in 
+spec.get("files", [])
             ],
             "built_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         }
