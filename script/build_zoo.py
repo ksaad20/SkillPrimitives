@@ -64,9 +64,7 @@ class ZooBuilder:
     def discover_primitives(self, names: Optional[set[str]] = None) -> list[Path]:
         """Find all primitive directories."""
         if not self.primitives_dir.exists():
-            console.print(f"[red]Primitives directory not found: 
-            {self.primitives_dir}[/red]"
-            )
+            console.print(f"[red]Primitives directory not found:{self.primitives_dir}[/red]")
             sys.exit(1)
 
         candidates = [
