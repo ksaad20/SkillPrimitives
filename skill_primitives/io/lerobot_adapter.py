@@ -1,9 +1,3 @@
-"""Adapter for LeRobot datasets on HuggingFace.
-
-Loads episodes from LeRobot-format datasets and standardizes
-them for the Skill Primitives pipeline.
-"""
-
 from __future__ import annotations
 
 from typing import Any
@@ -12,7 +6,6 @@ import numpy as np
 from datasets import Dataset
 
 from skill_primitives.io.base import BaseAdapter
-
 
 class LeRobotAdapter(BaseAdapter):
     """Load episodes from HuggingFace LeRobot datasets.
