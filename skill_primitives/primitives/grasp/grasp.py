@@ -11,7 +11,7 @@ from typing import Any, ClassVar
 
 import numpy as np
 
-from base import Primitive
+from skill_primitives.primitives.base import Primitive
 
 
 class Grasp(Primitive):
