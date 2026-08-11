@@ -1,29 +1,7 @@
 name: lift
-version: "0.0.1"
+version: "0.1.0"
 category: manipulation
 author: ksaad20
+description: Lift the grasped object vertically.
 files:
   - src: lift.py
-description: Object is lifted vertically while secured by gripper.
-
-detection:
-  strategy: sustained_positive_z_velocity
-  preconditions:
-    gripper_state: closed
-  parameters:
-    z_velocity_threshold: 0.005
-    min_duration_frames: 3
-  state_requirements:
-    velocity: true
-    gripper: true
-  confidence: 0.90
-
-constraints:
-  temporal_order: [grasp]
-  gripper_must_remain: closed
-
-natural_language:
-  templates:
-    - "lift the object vertically"
-    - "lift {object} up"
-    - "raise {object}"
