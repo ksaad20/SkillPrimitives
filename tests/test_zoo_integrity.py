@@ -1,5 +1,3 @@
-"""Validate pre-computed skill zoo integrity."""
-
 from pathlib import Path
 
 import pytest
