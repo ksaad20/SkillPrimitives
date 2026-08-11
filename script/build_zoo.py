@@ -118,9 +118,7 @@ class ZooBuilder:
                     return None
             else:
                 self.errors.append(
-                    f"{name}: Invalid file entry type: 
-{type(file_entry)}"
-                )
+                    f"{name}: Invalid file entry type:{type(file_entry)}")
                 return None
 
         return spec
