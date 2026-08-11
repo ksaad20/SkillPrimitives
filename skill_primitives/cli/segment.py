@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-"""CLI command to segment LeRobot episodes into skill primitives."""
-
 import argparse
 import json
 import sys
