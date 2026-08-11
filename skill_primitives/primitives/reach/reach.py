@@ -1,8 +1,12 @@
-"""Reach primitive: gripper open, approaching target object."""
+"""reach.py — Pre-grasp approach primitive toward a target object.
+
+Detects reach events from demonstration trajectories by identifying
+sustained end-effector motion while the gripper remains open.
+"""
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, ClassVar
 
 import numpy as np
 
@@ -10,13 +14,25 @@ from skill_primitives.primitives.base import Primitive
 
 
 class Reach(Primitive):
-    """Arm moves toward target object with gripper open.
+    """Move the open gripper toward the target object.
 
-    Detected as motion toward the target (decreasing distance)
-    while the gripper remains open, occurring before a grasp.
+    Detected from sustained end-effector motion while the gripper
+    remains open.
     """
 
-    name = "reach"
+    # ── Metadata ───────────────────────────────────────────────────────────
+    name: ClassVar[str] = "reach"
+    version: ClassVar[str] = "0.1.0"
+    category: ClassVar[str] = "manipulation"
+    description: ClassVar[str] = "Move the open gripper toward the target object."
+    author: ClassVar[str] = "ksaad20"
+
+    # ── Detection hyperparameters ──────────────────────────────────────────
+    OPEN_THRESHOLD: ClassVar[float] = 0.5
+    MIN_SPEED_THRESHOLD: ClassVar[float] = 0.01
+    MIN_DURATION: ClassVar[int] = 3
+    PRE_WINDOW: ClassVar[int] = 3
+    POST_WINDOW: ClassVar[int] = 2
 
     def detect(
         self,
@@ -24,88 +40,95 @@ class Reach(Primitive):
         state: np.ndarray | None = None,
         velocity: np.ndarray | None = None,
     ) -> list[dict[str, Any]]:
-        """Detect reach segments.
+        """Detect reach segments from open-gripper motion.
 
-        Strategy: Look for periods of motion with gripper open
-        that precede grasping. We approximate by finding motion
-        peaks before gripper closure transitions.
+        Args:
+            gripper: 1-D array of normalized gripper openings in [0, 1].
+            state: Optional 2-D array of robot states per timestep.
+            velocity: Optional 2-D array of velocities per timestep.
+
+        Returns:
+            List of segment dicts, each containing ``type``, ``start``,
+            ``end``, and ``confidence``.
         """
         segments: list[dict[str, Any]] = []
-        if len(gripper) < 5:
+        n = len(gripper)
+        if n < 2:
             return segments
 
-        # Compute velocity if not provided
-        vel = (
-            velocity
-            if velocity is not None and velocity.size > 0
-            else self._compute_velocity(state or np.array([]))
-        )
-        if vel.size == 0:
+        speed = self._compute_speed(state, velocity, n)
+        if speed is None:
             return segments
 
-        vel_mag = np.linalg.norm(vel, axis=1)
+        open_mask = gripper >= self.OPEN_THRESHOLD
 
-        # Find all grasp transitions to anchor reach detection
-        grasp_starts = []
-        for t in range(1, len(gripper)):
-            if gripper[t - 1] >= 0.5 and gripper[t] < 0.5:
-                grasp_starts.append(t)
-
-        # If no grasps found, look for any open-gripper motion
-        if not grasp_starts:
-            # Find sustained motion with open gripper
-            for t in range(len(gripper) - 5):
-                if self._gripper_is_open(gripper, t, t + 5) and np.mean(vel_mag[t : t + 5]) > 0.01:
-                    segments.append(
-                        {
-                            "type": self.name,
-                            "start": int(t),
-                            "end": int(t + 5),
-                            "confidence": 0.75,
-                        }
-                    )
-            return segments
-
-        # Detect reach before each grasp
-        for grasp_t in grasp_starts:
-            search_start = max(0, grasp_t - 20)
-            search_end = grasp_t
-
-            if search_end <= search_start:
+        i = 0
+        while i < n:
+            if not open_mask[i]:
+                i += 1
                 continue
 
-            # Find peak velocity in the window before grasp
-            window_vel = vel_mag[search_start:search_end]
-            if len(window_vel) == 0 or np.max(window_vel) < 0.005:
+            start = i
+            while i < n and open_mask[i]:
+                i += 1
+            end = i
+
+            if end - start < self.MIN_DURATION:
                 continue
 
-            peak_idx = search_start + int(np.argmax(window_vel))
-
-            # Expand window around peak while gripper is open
-            reach_start = peak_idx
-            while reach_start > search_start and gripper[reach_start] >= 0.4:
-                reach_start -= 1
-            reach_start = max(0, reach_start)
-
-            reach_end = min(grasp_t + 2, len(gripper))
-
-            # Verify gripper is open during reach
-            if not self._gripper_is_open(gripper, reach_start, min(reach_end, len(gripper))):
-                continue
-
-            segments.append(
-                {
-                    "type": self.name,
-                    "start": int(reach_start),
-                    "end": int(reach_end),
-                    "confidence": 0.88,
-                }
-            )
+            mean_speed = float(np.mean(speed[start:end]))
+            if mean_speed >= self.MIN_SPEED_THRESHOLD:
+                confidence = self._compute_confidence(mean_speed)
+                seg_start = max(0, start - self.PRE_WINDOW)
+                seg_end = min(n, end + self.POST_WINDOW)
+                segments.append(
+                    {
+                        "type": self.name,
+                        "start": int(seg_start),
+                        "end": int(seg_end),
+                        "confidence": float(confidence),
+                    }
+                )
 
         return segments
 
+    def _compute_speed(
+        self,
+        state: np.ndarray | None,
+        velocity: np.ndarray | None,
+        n: int,
+    ) -> np.ndarray | None:
+        """Return per-timestep speed, preferring velocity norm over state deltas."""
+        if velocity is not None and velocity.ndim == 2 and velocity.shape[0] == n:
+            return np.linalg.norm(velocity, axis=1)
+        if state is not None and state.ndim == 2 and state.shape[0] == n:
+            deltas = np.diff(state, axis=0, prepend=state[:1])
+            return np.linalg.norm(deltas, axis=1)
+        return None
+
+    def _compute_confidence(self, mean_speed: float) -> float:
+        """Higher confidence for faster, clearer approach motion."""
+        if mean_speed > 0.05:
+            return 0.93
+        if mean_speed > 0.02:
+            return 0.85
+        return 0.78
+
     def validate(self, segment: dict[str, Any]) -> bool:
-        return segment.get("type") == self.name
+        """Check segment quality beyond the default type match."""
+        if not super().validate(segment):
+            return False
+
+        duration = segment.get("end", 0) - segment.get("start", 0)
+        if duration <= 0:
+            return False
+
+        confidence = float(segment.get("confidence", 0.0))
+        return confidence >= 0.75
 
     def describe(self, segment: dict[str, Any]) -> str:
-        return "reach toward the target object"
+        """Generate natural-language description with confidence nuance."""
+        confidence = float(segment.get("confidence", 0.0))
+        if confidence >= 0.9:
+            return "reach toward the object quickly"
+        return "reach toward the object"
