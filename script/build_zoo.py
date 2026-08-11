@@ -226,9 +226,7 @@ spec.get("files", [])
         self._report()
         return len(self.errors) == 0
 
-    def _report(self): table = Table(title="Build Summary", show_header=True, header_style="bold 
-magenta"
-        )
+    def _report(self): table = Table(title="Build Summary", show_header=True, header_style="bold magenta")
         table.add_column("Metric", style="cyan")
         table.add_column("Count", justify="right", style="green")
 
