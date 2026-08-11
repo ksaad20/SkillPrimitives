@@ -5,6 +5,7 @@
 ![macOS](https://img.shields.io/badge/macOS-000000?logo=apple&logoColor=white)
 ![Windows](https://img.shields.io/badge/Windows-0078D6?logo=windows&logoColor=white)
 ![Tests](https://github.com/ksaad20/SkillPrimitives/actions/workflows/ci.yml/badge.svg)
+[![codecov](https://codecov.io/gh/ksaad20/SkillPrimitives/branch/main/graph/badge.svg)](https://codecov.io/gh/ksaad20/SkillPrimitives)
 
 # For collaborators
 pip install -e ".[dev]"
