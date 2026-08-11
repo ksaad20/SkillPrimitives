@@ -293,9 +293,7 @@ spec.get("files", [])
 def main():
     parser = argparse.ArgumentParser(description="Build the skills primitive zoo")
     parser.add_argument("--watch", action="store_true", help="Watch mode")
-    parser.add_argument("--primitives", nargs="+", help="Build only specified 
-primitives"
-    )
+    parser.add_argument("--primitives", nargs="+", help="Build only specified primitives")
     args = parser.parse_args()
 
     builder = ZooBuilder(PRIMITIVES_DIR, ZOO_DIR, TEMPLATES_DIR)
