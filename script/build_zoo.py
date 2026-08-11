@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-build_zoo.py — Regenerate all zoo/ artifacts from primitive sources.
+"""build_zoo.py — Regenerate all zoo/ artifacts from primitive sources.
 
 Scans the primitives/ directory, validates each skill definition,
 renders templates, and writes compiled artifacts to zoo/.
@@ -10,6 +9,8 @@ Usage:
     ./scripts/build_zoo.py --watch      # Watch mode for development
     ./scripts/build_zoo.py --primitives button card modal  # Selective build
 """
+
+from __future__ import annotations
 
 import argparse
 import json
@@ -95,11 +96,20 @@ class ZooBuilder:
         if spec["category"] not in VALID_CATEGORIES:
             self.warnings.append(f"{name}: Unknown category '{spec['category']}'")
 
-        # Check referenced files exist
+        # Check referenced files exist (handles both string and dict entries)
         for file_entry in spec.get("files", []):
-            src = primitive_dir / file_entry["src"]
-            if not src.exists():
-                self.errors.append(f"{name}: Referenced file missing: {file_entry['src']}")
+            if isinstance(file_entry, str):
+                src = primitive_dir / file_entry
+                if not src.exists():
+                    self.errors.append(f"{name}: Referenced file missing: {file_entry}")
+                    return None
+            elif isinstance(file_entry, dict):
+                src = primitive_dir / file_entry["src"]
+                if not src.exists():
+                    self.errors.append(f"{name}: Referenced file missing: {file_entry['src']}")
+                    return None
+            else:
+                self.errors.append(f"{name}: Invalid file entry type: {type(file_entry)}")
                 return None
 
         return spec
@@ -111,10 +121,14 @@ class ZooBuilder:
         output_dir = self.zoo_dir / name
         output_dir.mkdir(parents=True, exist_ok=True)
 
-        # Copy source files
+        # Copy source files (handles both string and dict entries)
         for file_entry in spec.get("files", []):
-            src = primitive_dir / file_entry["src"]
-            dst_name = file_entry.get("dest", file_entry["src"])
+            if isinstance(file_entry, str):
+                src = primitive_dir / file_entry
+                dst_name = file_entry
+            else:
+                src = primitive_dir / file_entry["src"]
+                dst_name = file_entry.get("dest", file_entry["src"])
             dst = output_dir / dst_name
             dst.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(src, dst)
@@ -139,7 +153,10 @@ class ZooBuilder:
             "category": spec["category"],
             "description": spec["description"],
             "author": spec["author"],
-            "files": [f.get("dest", f["src"]) for f in spec.get("files", [])],
+            "files": [
+                f if isinstance(f, str) else f.get("dest", f["src"])
+                for f in spec.get("files", [])
+            ],
             "built_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         }
         with open(output_dir / "metadata.yaml", "w", encoding="utf-8") as f:
@@ -208,12 +225,14 @@ class ZooBuilder:
         console.print(table)
 
         if self.errors:
-            console.print("\n[bold red]Errors:[/bold red]")
+            console.print("
+[bold red]Errors:[/bold red]")
             for err in self.errors:
                 console.print(f"  • {err}")
 
         if self.warnings:
-            console.print("\n[bold yellow]Warnings:[/bold yellow]")
+            console.print("
+[bold yellow]Warnings:[/bold yellow]")
             for warn in self.warnings:
                 console.print(f"  • {warn}")
 
@@ -237,12 +256,14 @@ class ZooBuilder:
                 now = time.time()
                 if now - self.debounce > 1.0:
                     self.debounce = now
-                    console.print(f"\n[yellow]Change detected: {event.src_path}[/yellow]")
+                    console.print(f"
+[yellow]Change detected: {event.src_path}[/yellow]")
                     self.builder.build()
                     console.rule()
 
         console.rule("[bold blue]👀 Watch Mode[/bold blue]")
-        console.print("Monitoring primitives/ for changes... (Ctrl+C to stop)\n")
+        console.print("Monitoring primitives/ for changes... (Ctrl+C to stop)
+")
 
         self.build()
         handler = RebuildHandler(self)
@@ -255,7 +276,8 @@ class ZooBuilder:
                 time.sleep(1)
         except KeyboardInterrupt:
             observer.stop()
-            console.print("\n[green]Watch mode stopped.[/green]")
+            console.print("
+[green]Watch mode stopped.[/green]")
         observer.join()
 
 
