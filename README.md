@@ -6,6 +6,12 @@
 ![Windows](https://img.shields.io/badge/Windows-0078D6?logo=windows&logoColor=white)
 ![Tests](https://github.com/ksaad20/SkillPrimitives/actions/workflows/ci.yml/badge.svg)
 
+# For collaborators
+pip install -e ".[dev]"
+
+# For early testers who want to try it
+pip install "skill-primitives @ git+https://github.com/ksaad20/SkillPrimitives.git@main"
+
 # SkillPrimitives
 A natural language to robot motion transformer. Decompose LeRobot datasets into composable skills, then generate manipulation trajectories from plain English.
 
