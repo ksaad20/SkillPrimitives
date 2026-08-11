@@ -1,4 +1,12 @@
 # SkillPrimitives
+
+![Python](https://img.shields.io/badge/python-3.9%2B-blue)
+![Linux](https://img.shields.io/badge/Linux-FCC624?logo=linux&logoColor=black)
+![macOS](https://img.shields.io/badge/macOS-000000?logo=apple&logoColor=white)
+![Windows](https://img.shields.io/badge/Windows-0078D6?logo=windows&logoColor=white)
+![Tests](https://github.com/ksaad20/SkillPrimitives/actions/workflows/ci.yml/badge.svg)
+
+# SkillPrimitives
 A natural language to robot motion transformer. Decompose LeRobot datasets into composable skills, then generate manipulation trajectories from plain English.
 
 # Skill Primitives
