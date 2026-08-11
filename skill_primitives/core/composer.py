@@ -1,9 +1,3 @@
-"""Skill composition and sequencing.
-
-Compose robot manipulation tasks by chaining skill primitives from a
-library, using natural language instructions as the interface.
-"""
-
 from __future__ import annotations
 
 import json
@@ -12,8 +6,6 @@ from typing import Any
 
 
 class Skill:
-    """A single skill primitive loaded from the skill library."""
-
     def __init__(
         self,
         skill_type: str,
