@@ -126,7 +126,6 @@ class PrimitiveAnnotator:
             raise ValueError(
                 "Unknown provider: %s. Supported: ollama, groq, openai" % self.provider
             )
-
         return self._client
 
     def _build_prompt(self, primitive: dict[str, Any]) -> str:
