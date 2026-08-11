@@ -1,9 +1,28 @@
 {
   "name": "Skill Primitives",
   "image": "mcr.microsoft.com/devcontainers/python:3.11",
+  "workspaceFolder": "/workspaces/SkillPrimitives",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/SkillPrimitives,type=bind,consistency=cached",
+  "runArgs": ["--init", "--env", "GIT_EDITOR=code --wait"],
+  "mounts": [
+    "source=skillprimitives-pip-cache,target=/home/vscode/.cache/pip,type=volume",
+    "source=skillprimitives-uv-cache,target=/home/vscode/.cache/uv,type=volume"
+  ],
+  "containerEnv": {
+    "PYTHONPATH": "/workspaces/SkillPrimitives",
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "PYTHONUNBUFFERED": "1",
+    "PIP_DISABLE_PIP_VERSION_CHECK": "1",
+    "FORCE_COLOR": "1",
+    "SKILLPRIMITIVES_LOG_LEVEL": "INFO"
+  },
   "features": {
     "ghcr.io/devcontainers/features/git:1": {},
-    "ghcr.io/devcontainers/features/github-cli:1": {}
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "moby": true,
+      "dockerDashComposeVersion": "v2"
+    }
   },
   "customizations": {
     "vscode": {
@@ -13,22 +32,43 @@
         "charliermarsh.ruff",
         "ms-python.mypy-type-checker",
         "ms-toolsai.jupyter",
-        "GitHub.vscode-pull-request-github"
+        "GitHub.vscode-pull-request-github",
+        "tamasfe.even-better-toml",
+        "redhat.vscode-yaml",
+        "ms-vscode.makefile-tools"
       ],
       "settings": {
         "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.analysis.typeCheckingMode": "basic",
+        "python.analysis.autoImportCompletions": true,
+        "python.analysis.extraPaths": ["/workspaces/SkillPrimitives"],
+        "python.analysis.include": ["skill_primitives", "tests", "script"],
+        "python.terminal.activateEnvironment": false,
         "python.testing.pytestEnabled": true,
-        "python.testing.pytestArgs": ["tests"],
+        "python.testing.pytestArgs": ["tests", "-v", "--tb=short"],
+        "python.testing.unittestEnabled": false,
+        "python.testing.nosetestsEnabled": false,
         "editor.formatOnSave": true,
         "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.rulers": [100],
         "editor.codeActionsOnSave": {
-          "source.organizeImports": "explicit"
+          "source.organizeImports": "explicit",
+          "source.fixAll.ruff": "explicit"
         },
-        "black-formatter.args": ["--line-length", "100"],
+        "black-formatter.args": ["--line-length", "100", "--target-version", "py311"],
+        "black-formatter.interpreter": ["/usr/local/bin/python"],
+        "ruff.interpreter": ["/usr/local/bin/python"],
         "ruff.organizeImports": true,
         "ruff.lint.run": "onSave",
+        "ruff.lint.select": ["E", "F", "I", "UP", "W"],
         "ruff.format.enable": false,
-        "mypy-type-checker.args": ["--show-error-codes"],
+        "mypy-type-checker.interpreter": ["/usr/local/bin/python"],
+        "mypy-type-checker.args": [
+          "--show-error-codes",
+          "--ignore-missing-imports",
+          "--warn-unused-ignores"
+        ],
+        "mypy-type-checker.reportingScope": "workspace",
         "files.exclude": {
           "**/__pycache__": true,
           "**/.pytest_cache": true,
@@ -36,12 +76,52 @@
           "**/.ruff_cache": true,
           "**/dist": true,
           "**/build": true,
-          "**/*.egg-info": true
+          "**/*.egg-info": true,
+          "**/.coverage": true,
+          "**/coverage.xml": true,
+          "**/htmlcov": true,
+          "**/zoo": true
+        },
+        "files.watcherExclude": {
+          "**/__pycache__/**": true,
+          "**/.pytest_cache/**": true,
+          "**/.mypy_cache/**": true,
+          "**/.ruff_cache/**": true,
+          "**/dist/**": true,
+          "**/build/**": true,
+          "**/*.egg-info/**": true,
+          "**/zoo/**": true
+        },
+        "search.exclude": {
+          "**/__pycache__": true,
+          "**/.pytest_cache": true,
+          "**/dist": true,
+          "**/build": true,
+          "**/zoo": true
         }
       }
     }
   },
+  "forwardPorts": [8080, 3000],
+  "portsAttributes": {
+    "8080": {
+      "label": "Zoo Gallery",
+      "onAutoForward": "notify"
+    },
+    "3000": {
+      "label": "Dev Server",
+      "onAutoForward": "silent"
+    }
+  },
+  "otherPortsAttributes": {
+    "onAutoForward": "silent"
+  },
   "postCreateCommand": "bash .devcontainer/post-create.sh",
   "postStartCommand": "git config --global --add safe.directory /workspaces/SkillPrimitives",
-  "remoteUser": "vscode"
+  "postAttachCommand": {
+    "server": "python -m http.server 8080 --directory /workspaces/SkillPrimitives/zoo || true"
+  },
+  "remoteUser": "vscode",
+  "updateContentCommand": "pip install -e .[dev] --quiet",
+  "waitFor": "postCreateCommand"
 }
