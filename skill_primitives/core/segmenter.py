@@ -1,23 +1,10 @@
-"""Heuristic trajectory segmentation for LeRobot datasets.
-
-Segments robot manipulation episodes into discrete primitives
-(reach, grasp, lift, transport, place) using gripper state transitions
-and end-effector motion heuristics.
-"""
-
 from __future__ import annotations
-
 from typing import Any
 
 import numpy as np
 
 
 class Segmenter:
-    """Segment a robot manipulation episode into discrete skill primitives."""
-
-    # ------------------------------------------------------------------
-    # Public API
-    # ------------------------------------------------------------------
     def segment(self, episode: dict[str, Any]) -> list[dict[str, Any]]:
         """Segment an already-loaded episode into discrete primitives.
 
