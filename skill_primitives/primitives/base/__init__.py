@@ -6,7 +6,7 @@ concrete primitive (grasp, reach, retract, etc.) must subclass.
 
 from __future__ import annotations
 
-from base.base import Primitive
+from skill_primitives.primitives.base.base import Primitive
 
 __all__ = [
     "Primitive",
