@@ -6,6 +6,6 @@ and natural-language description generation.
 
 from __future__ import annotations
 
-from reach.reach import Reach
+from skill_primitives.primitives.reach.reach import Reach
 
 __all__ = ["Reach"]
