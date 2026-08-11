@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-"""CLI command to annotate skill primitives with natural language."""
-
 import argparse
 import json
 import sys
