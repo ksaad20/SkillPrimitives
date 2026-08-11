@@ -7,6 +7,7 @@ from datasets import Dataset
 
 from skill_primitives.io.base import BaseAdapter
 
+
 class LeRobotAdapter(BaseAdapter):
     """Load episodes from HuggingFace LeRobot datasets.
 
