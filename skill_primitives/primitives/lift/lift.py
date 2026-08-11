@@ -1,8 +1,13 @@
-"""Lift primitive: object moves upward with gripper closed."""
+"""lift.py — Vertical lift primitive after object acquisition.
+
+Detects lift events from demonstration trajectories by identifying
+sustained upward end-effector displacement while the gripper remains
+closed.
+"""
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, ClassVar
 
 import numpy as np
 
@@ -10,13 +15,24 @@ from skill_primitives.primitives.base import Primitive
 
 
 class Lift(Primitive):
-    """Object is lifted vertically while secured by gripper.
+    """Lift the grasped object vertically.
 
-    Detected as sustained positive z-velocity with gripper closed,
-    occurring after a grasp.
+    Detected from sustained upward Z displacement while the gripper
+    remains closed.
     """
 
-    name = "lift"
+    # ── Metadata ───────────────────────────────────────────────────────────
+    name: ClassVar[str] = "lift"
+    version: ClassVar[str] = "0.1.0"
+    category: ClassVar[str] = "manipulation"
+    description: ClassVar[str] = "Lift the grasped object vertically."
+    author: ClassVar[str] = "ksaad20"
+
+    # ── Detection hyperparameters ──────────────────────────────────────────
+    CLOSED_THRESHOLD: ClassVar[float] = 0.5
+    Z_RISE_THRESHOLD: ClassVar[float] = 0.02
+    MIN_DURATION: ClassVar[int] = 5
+    Z_INDEX: ClassVar[int] = 2
 
     def detect(
         self,
@@ -24,49 +40,80 @@ class Lift(Primitive):
         state: np.ndarray | None = None,
         velocity: np.ndarray | None = None,
     ) -> list[dict[str, Any]]:
-        """Detect lift segments: positive z-velocity with closed gripper."""
+        """Detect lift segments from upward Z motion with closed gripper.
+
+        Args:
+            gripper: 1-D array of normalized gripper openings in [0, 1].
+            state: 2-D array of robot states per timestep. The Z position
+                is expected at column :attr:`Z_INDEX`.
+            velocity: Optional 2-D array of velocities per timestep.
+
+        Returns:
+            List of segment dicts, each containing ``type``, ``start``,
+            ``end``, and ``confidence``.
+        """
         segments: list[dict[str, Any]] = []
-        if len(gripper) < 3:
+        if state is None or len(gripper) < 2:
             return segments
 
-        vel = (
-            velocity
-            if velocity is not None and velocity.size > 0
-            else self._compute_velocity(state or np.array([]))
-        )
-        if vel.size == 0 or vel.shape[1] < 3:
+        n = len(gripper)
+        if state.ndim != 2 or state.shape[0] != n:
             return segments
 
-        z_vel = vel[:, 2]
-        min_lift_frames = 3
-        z_threshold = 0.005
+        z = state[:, self.Z_INDEX]
+        closed = gripper < self.CLOSED_THRESHOLD
 
-        t = 0
-        while t < len(z_vel):
-            # Look for start of upward motion
-            if z_vel[t] > z_threshold and gripper[t] < 0.5:
-                start = t
-                # Extend while z-velocity stays positive and gripper closed
-                while t < len(z_vel) and z_vel[t] > z_threshold and gripper[t] < 0.5:
-                    t += 1
-                end = t
+        i = 0
+        while i < n:
+            if not closed[i]:
+                i += 1
+                continue
 
-                if end - start >= min_lift_frames:
-                    segments.append(
-                        {
-                            "type": self.name,
-                            "start": int(start),
-                            "end": int(end),
-                            "confidence": 0.90,
-                        }
-                    )
-            else:
-                t += 1
+            start = i
+            while i < n and closed[i]:
+                i += 1
+            end = i
+
+            if end - start < self.MIN_DURATION:
+                continue
+
+            z_rise = float(z[end - 1] - z[start])
+            if z_rise >= self.Z_RISE_THRESHOLD:
+                confidence = self._compute_confidence(z_rise)
+                segments.append(
+                    {
+                        "type": self.name,
+                        "start": int(start),
+                        "end": int(end),
+                        "confidence": float(confidence),
+                    }
+                )
 
         return segments
 
+    def _compute_confidence(self, z_rise: float) -> float:
+        """Higher confidence for larger, clearer Z displacement."""
+        if z_rise > 0.1:
+            return 0.95
+        if z_rise > 0.05:
+            return 0.88
+        return 0.80
+
     def validate(self, segment: dict[str, Any]) -> bool:
-        return segment.get("type") == self.name
+        """Check segment quality beyond the default type match."""
+        if not super().validate(segment):
+            return False
+
+        duration = segment.get("end", 0) - segment.get("start", 0)
+        if duration < self.MIN_DURATION:
+            return False
+
+        confidence = float(segment.get("confidence", 0.0))
+        return confidence >= 0.75
 
     def describe(self, segment: dict[str, Any]) -> str:
-        return "lift the object vertically"
+        """Generate natural-language description with confidence nuance."""
+        confidence = float(segment.get("confidence", 0.0))
+        if confidence >= 0.9:
+            return "lift the object steadily"
+        return "lift the object"
