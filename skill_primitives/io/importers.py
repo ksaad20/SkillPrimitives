@@ -5,6 +5,10 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
+"""Import trajectories from custom formats.
+
+...
+"""
 
 def import_data(path: str, **kwargs: Any) -> dict[str, Any]:
     """Import a trajectory from a CSV file.
