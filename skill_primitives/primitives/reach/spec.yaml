@@ -1,35 +1,7 @@
 name: reach
-version: "0.0.1"
+version: "0.1.0"
 category: manipulation
 author: ksaad20
+description: Move the open gripper toward the target object.
 files:
   - src: reach.py
-description: Arm moves toward target object with gripper open.
-
-detection:
-  strategy: motion_toward_target_with_open_gripper
-  preconditions:
-    gripper_state: open
-  anchor:
-    event: grasp_transition
-    search_window: 20
-  parameters:
-    peak_velocity_threshold: 0.005
-    min_open_gripper_frames: 5
-    fallback_confidence: 0.75
-  state_requirements:
-    velocity: true
-    gripper: true
-  confidence: 0.88
-
-constraints:
-  temporal_order: []
-  must_precede: [grasp]
-  gripper_must_remain: open
-
-natural_language:
-  templates:
-    - "reach toward the target object"
-    - "reach for {object}"
-    - "move toward {object}"
-    - "approach {object}"
