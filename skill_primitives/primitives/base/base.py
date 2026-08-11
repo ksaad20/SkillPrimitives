@@ -1,10 +1,3 @@
-"""Base class for all skill primitives.
-
-All manipulation primitives (reach, grasp, lift, transport, place)
-inherit from Primitive and implement detection heuristics specific
-to their physical meaning.
-"""
-
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
