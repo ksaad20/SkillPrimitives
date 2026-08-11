@@ -3,7 +3,6 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-
 PRIMITIVE_SCHEMA: dict[str, Any] = {
     "required": {"type", "start", "end"},
     "optional": {"confidence", "description", "metadata", "trajectory"},
