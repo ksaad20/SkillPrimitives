@@ -110,9 +110,7 @@ class ZooBuilder:
             if isinstance(file_entry, str):
                 src = primitive_dir / file_entry
                 if not src.exists():
-                    self.errors.append(
-                        f"{name}: Referenced file missing: {file_entry}"
-                    )
+                    self.errors.append(f"{name}: Referenced file missing: {file_entry}")
                     return None
             elif isinstance(file_entry, dict):
                 src = primitive_dir / file_entry["src"]
@@ -198,17 +196,13 @@ class ZooBuilder:
             TextColumn("[progress.description]{task.description}"),
         ]
         if is_ci:
-            progress_columns = [
-                TextColumn("[progress.description]{task.description}")
-            ]
+            progress_columns = [TextColumn("[progress.description]{task.description}")]
 
         with Progress(
             *progress_columns,
             console=console,
         ) as progress:
-            task = progress.add_task(
-                "Building primitives...", total=len(primitives)
-            )
+            task = progress.add_task("Building primitives...", total=len(primitives))
 
             for primitive_dir in primitives:
                 progress.update(
@@ -267,8 +261,7 @@ class ZooBuilder:
             from watchdog.observers import Observer
         except ImportError:
             console.print(
-                "[red]watchdog required for --watch. "
-                "Run: pip install watchdog[/red]"
+                "[red]watchdog required for --watch. " "Run: pip install watchdog[/red]"
             )
             sys.exit(1)
 
@@ -283,16 +276,12 @@ class ZooBuilder:
                 now = time.time()
                 if now - self.debounce > 1.0:
                     self.debounce = now
-                    console.print(
-                        f"[yellow]Change detected: {event.src_path}[/yellow]"
-                    )
+                    console.print(f"[yellow]Change detected: {event.src_path}[/yellow]")
                     self.builder.build()
                     console.rule()
 
         console.rule("[bold blue]Watch Mode[/bold blue]")
-        console.print(
-            "Monitoring primitives/ for changes... (Ctrl+C to stop)"
-        )
+        console.print("Monitoring primitives/ for changes... (Ctrl+C to stop)")
 
         self.build()
         handler = RebuildHandler(self)
