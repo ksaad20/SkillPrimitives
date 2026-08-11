@@ -1,16 +1,3 @@
-#!/usr/bin/env python3
-"""
-generate_gifs.py — Auto-render preview GIFs for every zoo primitive.
-
-Captures animated previews of each primitive by rendering its HTML
-in a headless browser and recording the result as an optimized GIF.
-
-Usage:
-    ./scripts/generate_gifs.py --all              # Generate all previews
-    ./scripts/generate_gifs.py --primitive button # Generate only for 'button'
-    ./scripts/generate_gifs.py --dry-run          # Show what would be generated
-"""
-
 import argparse
 import json
 import shutil
