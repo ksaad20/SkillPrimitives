@@ -1,17 +1,8 @@
-"""Schema and trajectory validation.
-
-Validates primitives, composed sequences, and skill library structures
-to ensure data integrity across the pipeline.
-"""
-
 from __future__ import annotations
 
 from pathlib import Path
 from typing import Any
 
-# ---------------------------------------------------------------------------
-# Schema definitions
-# ---------------------------------------------------------------------------
 
 PRIMITIVE_SCHEMA: dict[str, Any] = {
     "required": {"type", "start", "end"},
@@ -27,11 +18,6 @@ PRIMITIVE_SCHEMA: dict[str, Any] = {
 }
 
 VALID_PRIMITIVE_TYPES: set[str] = {"reach", "grasp", "lift", "transport", "place"}
-
-
-# ---------------------------------------------------------------------------
-# Primitive validation
-# ---------------------------------------------------------------------------
 
 
 def validate_primitive(primitive: dict[str, Any]) -> list[str]:
