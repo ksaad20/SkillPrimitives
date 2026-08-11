@@ -1,15 +1,3 @@
-#!/usr/bin/env python3
-"""build_zoo.py — Regenerate all zoo/ artifacts from primitive sources.
-
-Scans the primitives/ directory, validates each skill definition,
-renders templates, and writes compiled artifacts to zoo/.
-
-Usage:
-    ./scripts/build_zoo.py              # Full rebuild
-    ./scripts/build_zoo.py --watch      # Watch mode for development
-    ./scripts/build_zoo.py --primitives button card modal  # Selective build
-"""
-
 from __future__ import annotations
 
 import argparse
