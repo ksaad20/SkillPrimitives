@@ -6,6 +6,6 @@ and natural-language description generation.
 
 from __future__ import annotations
 
-from grasp.grasp import Grasp
+from skill_primitives.primitives.grasp.grasp import Grasp
 
 __all__ = ["Grasp"]
