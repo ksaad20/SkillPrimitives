@@ -22,6 +22,8 @@ _MOCK_JSON = json.dumps(
         "complexity": "simple",
         "dependencies": [],
         "examples": [],
+        "type": "mock",
+        "description": "Mock description for demo compatibility",
     }
 )
 
