@@ -6,6 +6,6 @@ and natural-language description generation.
 
 from __future__ import annotations
 
-from lift.lift import Lift
+from skill_primitives.primitives.lift.lift import Lift
 
 __all__ = ["Lift"]
