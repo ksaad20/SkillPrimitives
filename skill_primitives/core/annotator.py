@@ -123,10 +123,9 @@ class PrimitiveAnnotator:
                 self._client = _DummyClient()
 
         else:
-            raise ValueError(
-                "Unknown provider: %s. Supported: ollama, groq,"
-"openai".format(self.provider)
-            )
+            _msg = "Unknown provider: {}. Supported: ollama, groq, openai"
+            raise ValueError(_msg.format(self.provider))
+
         return self._client
 
     def _build_prompt(self, primitive: dict[str, Any]) -> str:
