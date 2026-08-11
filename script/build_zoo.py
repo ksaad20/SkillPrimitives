@@ -37,13 +37,26 @@ META_FILE = PROJECT_ROOT / "zoo_manifest.json"
 
 REQUIRED_FIELDS = {"name", "version", "category", "description", "author", "files"}
 VALID_CATEGORIES = {
-    "ui",
-    "animation",
-    "layout",
+    "base",
+    "manipulation",
+    "navigation",
+    "motion",
+    "grasp",
+    "perception",
     "interaction",
-    "accessibility",
     "utility",
 }
+
+
+def _normalize_files(files_raw):
+    """Ensure files is always a list of str or dict entries."""
+    if isinstance(files_raw, str):
+        return [files_raw]
+    if isinstance(files_raw, dict):
+        return [files_raw]
+    if isinstance(files_raw, list):
+        return files_raw
+    return []
 
 
 class ZooBuilder:
@@ -102,22 +115,40 @@ class ZooBuilder:
         if spec["category"] not in VALID_CATEGORIES:
             self.warnings.append(f"{name}: Unknown category '{spec['category']}'")
 
-        # Check referenced files exist (handles both string and dict entries)
-        for file_entry in spec.get("files", []):
+        # Normalize files so we always iterate over proper entries
+        files = _normalize_files(spec.get("files", []))
+        if not isinstance(spec.get("files", []), list) and not isinstance(
+            spec.get("files", []), (str, dict)
+        ):
+            self.errors.append(f"{name}: 'files' must be a list, string, or dict")
+            return None
+
+        for file_entry in files:
             if isinstance(file_entry, str):
                 src = primitive_dir / file_entry
                 if not src.exists():
                     self.errors.append(f"{name}: Referenced file missing:{file_entry}")
                     return None
             elif isinstance(file_entry, dict):
+                if "src" not in file_entry:
+                    self.errors.append(
+                        f"{name}: File entry dict missing 'src' key: {file_entry}"
+                    )
+                    return None
                 src = primitive_dir / file_entry["src"]
                 if not src.exists():
-                    self.errors.append(f"{name}: Referenced file missing:{file_entry['src']}")
+                    self.errors.append(
+                        f"{name}: Referenced file missing:{file_entry['src']}"
+                    )
                     return None
             else:
-                self.errors.append(f"{name}: Invalid file entry type:{type(file_entry)}")
+                self.errors.append(
+                    f"{name}: Invalid file entry type:{type(file_entry).__name__}"
+                )
                 return None
 
+        # Store normalized files back on spec so build_primitive sees a list
+        spec["files"] = files
         return spec
 
     # ── Build ──────────────────────────────────────────────────────────────────
@@ -132,9 +163,12 @@ class ZooBuilder:
             if isinstance(file_entry, str):
                 src = primitive_dir / file_entry
                 dst_name = file_entry
-            else:
+            elif isinstance(file_entry, dict):
                 src = primitive_dir / file_entry["src"]
                 dst_name = file_entry.get("dest", file_entry["src"])
+            else:
+                # Should never reach here because validate_primitive guards it
+                continue
             dst = output_dir / dst_name
             dst.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(src, dst)
@@ -160,7 +194,8 @@ class ZooBuilder:
             "description": spec["description"],
             "author": spec["author"],
             "files": [
-                f if isinstance(f, str) else f.get("dest", f["src"]) for f in spec.get("files", [])
+                f if isinstance(f, str) else f.get("dest", f["src"])
+                for f in spec.get("files", [])
             ],
             "built_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         }
@@ -212,7 +247,9 @@ class ZooBuilder:
                 progress.advance(task)
 
         # Write manifest
-        self.manifest["generated_at"] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+        self.manifest["generated_at"] = time.strftime(
+            "%Y-%m-%dT%H:%M:%SZ", time.gmtime()
+        )
         with open(META_FILE, "w", encoding="utf-8") as f:
             json.dump(self.manifest, f, indent=2)
 
@@ -221,7 +258,9 @@ class ZooBuilder:
         return len(self.errors) == 0
 
     def _report(self):
-        table = Table(title="Build Summary", show_header=True, header_style="bold magenta")
+        table = Table(
+            title="Build Summary", show_header=True, header_style="bold magenta"
+        )
         table.add_column("Metric", style="cyan")
         table.add_column("Count", justify="right", style="green")
 
@@ -248,7 +287,9 @@ class ZooBuilder:
             from watchdog.events import FileSystemEventHandler
             from watchdog.observers import Observer
         except ImportError:
-            console.print("[red]watchdog required for --watch. " "Run: pip install watchdog[/red]")
+            console.print(
+                "[red]watchdog required for --watch. " "Run: pip install watchdog[/red]"
+            )
             sys.exit(1)
 
         class RebuildHandler(FileSystemEventHandler):
@@ -262,7 +303,9 @@ class ZooBuilder:
                 now = time.time()
                 if now - self.debounce > 1.0:
                     self.debounce = now
-                    console.print(f"[yellow]Change detected: {event.src_path}[/yellow]")
+                    console.print(
+                        f"[yellow]Change detected: {event.src_path}[/yellow]"
+                    )
                     self.builder.build()
                     console.rule()
 
@@ -287,7 +330,9 @@ class ZooBuilder:
 def main():
     parser = argparse.ArgumentParser(description="Build the skills primitive zoo")
     parser.add_argument("--watch", action="store_true", help="Watch mode")
-    parser.add_argument("--primitives", nargs="+", help="Build only specified primitives")
+    parser.add_argument(
+        "--primitives", nargs="+", help="Build only specified primitives"
+    )
     args = parser.parse_args()
 
     builder = ZooBuilder(PRIMITIVES_DIR, ZOO_DIR, TEMPLATES_DIR)
