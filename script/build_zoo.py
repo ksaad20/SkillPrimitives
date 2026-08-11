@@ -254,9 +254,7 @@ spec.get("files", [])
             from watchdog.events import FileSystemEventHandler
             from watchdog.observers import Observer
         except ImportError:
-            console.print("[red]watchdog required for --watch. " "Run: pip
-install watchdog[/red]"
-            )
+            console.print("[red]watchdog required for --watch. " "Run: pip install watchdog[/red]")
             sys.exit(1)
 
         class RebuildHandler(FileSystemEventHandler):
