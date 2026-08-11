@@ -1,10 +1,3 @@
-"""SkillPrimitives — Natural-language to robotics motion primitive library.
-
-Provides the annotation engine for segmenting demonstration trajectories
-into composable skill primitives (reach, grasp, lift, transport, place)
-and a registry for runtime discovery.
-"""
-
 from __future__ import annotations
 
 from skill_primitives.primitives.base import Primitive
