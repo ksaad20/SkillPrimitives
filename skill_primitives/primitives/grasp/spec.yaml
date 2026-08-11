@@ -1,37 +1,7 @@
 name: grasp
-version: "0.0.1"
-category: manipulation
+version: "0.1.0"
+category: grasp
 author: ksaad20
+description: Gripper closes to secure an object.
 files:
   - src: grasp.py
-description: Gripper closes to secure an object.
-
-detection:
-  strategy: gripper_closing_transition
-  preconditions:
-    gripper_state: open
-  transition:
-    to: closed
-  parameters:
-    pre_window: 3
-    post_window: 5
-  post_condition:
-    gripper_state: closed
-    verification_window: 5
-    mean_threshold: 0.6
-  state_requirements:
-    gripper: true
-  confidence:
-    base: 0.75
-    with_post_closure_verification: 0.92
-
-constraints:
-  temporal_order: [reach]
-  gripper_must_end: closed
-
-natural_language:
-  templates:
-    - "grasp the object firmly"
-    - "grasp {object}"
-    - "pick up {object}"
-    - "grab {object}"
