@@ -100,10 +100,12 @@ class Reach(Primitive):
     ) -> np.ndarray | None:
         """Return per-timestep speed, preferring velocity norm over state deltas."""
         if velocity is not None and velocity.ndim == 2 and velocity.shape[0] == n:
-            return np.linalg.norm(velocity, axis=1)
+            speed: np.ndarray = np.linalg.norm(velocity, axis=1)
+            return speed
         if state is not None and state.ndim == 2 and state.shape[0] == n:
             deltas = np.diff(state, axis=0, prepend=state[:1])
-            return np.linalg.norm(deltas, axis=1)
+            speed = np.linalg.norm(deltas, axis=1)
+            return speed
         return None
 
     def _compute_confidence(self, mean_speed: float) -> float:
