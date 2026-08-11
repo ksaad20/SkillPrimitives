@@ -97,12 +97,12 @@ class Grasp(Primitive):
         if duration <= 0:
             return False
 
-        confidence = segment.get("confidence", 0.0)
+        confidence = float(segment.get("confidence", 0.0))
         return confidence >= self.CONFIDENCE_LOW
 
     def describe(self, segment: dict[str, Any]) -> str:
         """Generate natural-language description with confidence nuance."""
-        confidence = segment.get("confidence", self.CONFIDENCE_LOW)
+        confidence = float(segment.get("confidence", self.CONFIDENCE_LOW))
         if confidence >= self.CONFIDENCE_HIGH:
             return "grasp the object firmly"
         return "grasp the object"
