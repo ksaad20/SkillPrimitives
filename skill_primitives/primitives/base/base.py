@@ -1,24 +1,38 @@
+"""base.py — Abstract base class for annotation primitives.
+
+Every primitive in the annotation engine (grasp, reach, retract, etc.)
+must subclass :class:`Primitive` and implement :meth:`detect`. The
+``annotate`` script drives the full pipeline:
+``detect → validate → describe``.
+"""
+
 from __future__ import annotations
 
+import logging
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, ClassVar
 
 import numpy as np
 
+logger = logging.getLogger(__name__)
+
 
 class Primitive(ABC):
-    """Abstract base class for a manipulative skill primitive.
+    """Base class for robotics skill annotation primitives.
 
-    Subclasses must implement:
-    - detect(): Find occurrences in a trajectory
-    - validate(): Check a segment is valid
-
-    Subclasses may override:
-    - describe(): Generate natural language description
+    Subclasses define how to detect their signature in raw demonstration
+    trajectories, validate the quality of detected segments, and generate
+    natural-language descriptions for training the NL→motion transformer.
     """
 
-    name: str = ""
+    # ── Class-level metadata ───────────────────────────────────────────────
+    name: ClassVar[str] = ""
+    version: ClassVar[str] = "0.0.0"
+    category: ClassVar[str] = "utility"
+    description: ClassVar[str] = ""
+    author: ClassVar[str] = ""
 
+    # ── Core annotation interface ──────────────────────────────────────────
     @abstractmethod
     def detect(
         self,
@@ -26,95 +40,65 @@ class Primitive(ABC):
         state: np.ndarray | None = None,
         velocity: np.ndarray | None = None,
     ) -> list[dict[str, Any]]:
-        """Detect occurrences of this primitive in a trajectory.
+        """Find segments in demonstration data that match this primitive.
 
         Args:
-            gripper: Array of shape (T,) with normalized gripper states
-                in [0, 1]. Values >= 0.5 indicate open, < 0.5 closed.
-            state: Array of shape (T, D) with robot state observations.
-                Typically includes end-effector position/orientation.
-            velocity: Array of shape (T, 3) with end-effector xyz velocity.
-                Pre-computed for efficiency.
+            gripper: 1-D array of normalized gripper openings [0, 1].
+            state: 2-D array of robot states (joints or pose) per timestep.
+            velocity: 2-D array of velocities per timestep.
 
         Returns:
-            List of segment dicts, each with keys:
-            - type: primitive type name
-            - start: start frame index (inclusive)
-            - end: end frame index (exclusive)
-            - confidence: detection confidence in [0.0, 1.0]
+            List of segment dicts. Each dict must contain at least
+            ``{"type": self.name, "start": int, "end": int}``.
         """
-        ...
+        ...  # pragma: no cover
 
-    @abstractmethod
     def validate(self, segment: dict[str, Any]) -> bool:
-        """Validate that a detected segment is a valid instance.
+        """Check whether a detected segment is valid.
 
-        Args:
-            segment: Dict with at least type, start, end keys.
-
-        Returns:
-            True if the segment is valid for this primitive type.
+        The default implementation verifies that ``segment["type"]``
+        matches :attr:`name`. Subclasses may add domain-specific checks
+        (e.g., duration thresholds, signal quality).
         """
-        ...
+        return segment.get("type") == self.name
 
     def describe(self, segment: dict[str, Any]) -> str:
-        """Generate a natural language description for a segment.
+        """Generate a natural-language description of *segment*.
 
-        Override in subclasses for more specific descriptions.
-
-        Args:
-            segment: Detected segment dict.
-
-        Returns:
-            Natural language command string.
+        Override to produce task-specific phrasing used by the transformer.
         """
         return f"perform {self.name}"
 
-    def _compute_velocity(self, state: np.ndarray) -> np.ndarray:
-        """Compute end-effector velocity from state.
+    # ── Pipeline convenience ───────────────────────────────────────────────
+    def annotate(
+        self,
+        gripper: np.ndarray,
+        state: np.ndarray | None = None,
+        velocity: np.ndarray | None = None,
+    ) -> list[dict[str, Any]]:
+        """Run the full annotation pipeline in one call.
 
-        Convenience method for subclasses that need velocity
-        but receive only state.
-
-        Args:
-            state: Array of shape (T, D) with state observations.
-
-        Returns:
-            Array of shape (T, 3) with xyz velocity.
+        This is the entry point used by the ``annotate`` script.
         """
-        if state.size == 0 or state.shape[1] < 3:
-            return np.array([])
-        pos = state[:, :3].astype(float)
-        vel = np.zeros_like(pos)
-        vel[1:] = pos[1:] - pos[:-1]
-        return vel
+        segments = self.detect(gripper, state, velocity)
+        results: list[dict[str, Any]] = []
+        for seg in segments:
+            if self.validate(seg):
+                seg["description"] = self.describe(seg)
+                results.append(seg)
+        return results
 
-    def _gripper_is_open(self, gripper: np.ndarray, start: int, end: int) -> bool:
-        """Check if gripper is predominantly open in a frame range.
+    # ── Introspection helpers ──────────────────────────────────────────────
+    @classmethod
+    def get_metadata(cls) -> dict[str, Any]:
+        """Return static metadata consumed by ``build_zoo.py``."""
+        return {
+            "name": cls.name,
+            "version": cls.version,
+            "category": cls.category,
+            "description": cls.description,
+            "author": cls.author,
+        }
 
-        Args:
-            gripper: Array of shape (T,) with gripper states.
-            start: Start frame.
-            end: End frame.
-
-        Returns:
-            True if mean gripper state >= 0.4 (mostly open).
-        """
-        if start >= end or start >= len(gripper):
-            return False
-        return float(np.mean(gripper[start:end])) >= 0.4
-
-    def _gripper_is_closed(self, gripper: np.ndarray, start: int, end: int) -> bool:
-        """Check if gripper is predominantly closed in a frame range.
-
-        Args:
-            gripper: Array of shape (T,) with gripper states.
-            start: Start frame.
-            end: End frame.
-
-        Returns:
-            True if mean gripper state < 0.6 (mostly closed).
-        """
-        if start >= end or start >= len(gripper):
-            return False
-        return float(np.mean(gripper[start:end])) < 0.6
+    def __repr__(self) -> str:
+        return f"<Primitive {self.name}@{self.version} ({self.category})>"
