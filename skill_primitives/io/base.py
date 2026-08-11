@@ -1,15 +1,7 @@
-"""Abstract base classes for dataset adapters and exporters.
-
-Provides the interface contract for:
-- Loading robot trajectory datasets from various sources
-- Exporting composed tasks to various formats
-"""
-
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from typing import Any
-
 
 class BaseAdapter(ABC):
     """Adapter for loading robot trajectory datasets.
