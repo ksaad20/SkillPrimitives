@@ -5,6 +5,8 @@ Provides concrete implementations of manipulation primitives
 for discovery and instantiation.
 """
 
+from __future__ import annotations
+
 from skill_primitives.primitives.base import Primitive
 from skill_primitives.primitives.grasp import Grasp
 from skill_primitives.primitives.lift import Lift
