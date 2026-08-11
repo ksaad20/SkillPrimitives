@@ -1,3 +1,9 @@
-from .base import Primitive as Primitive
+from __future__ import annotations
 
-__all__ = ["Primitive"]
+from base.base import Primitive, RobotState, Trajectory
+
+__all__ = [
+    "Primitive",
+    "RobotState",
+    "Trajectory",
+]
