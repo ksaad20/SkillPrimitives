@@ -1,3 +1,15 @@
+#!/usr/bin/env python3
+"""build_zoo.py — Regenerate all zoo/ artifacts from primitive sources.
+
+Scans the primitives/ directory, validates each skill definition,
+renders templates, and writes compiled artifacts to zoo/.
+
+Usage:
+    ./scripts/build_zoo.py              # Full rebuild
+    ./scripts/build_zoo.py --watch      # Watch mode for development
+    ./scripts/build_zoo.py --primitives button card modal  # Selective build
+"""
+
 from __future__ import annotations
 
 import argparse
@@ -24,14 +36,7 @@ ZOO_DIR = PROJECT_ROOT / "zoo"
 TEMPLATES_DIR = PROJECT_ROOT / "templates"
 META_FILE = PROJECT_ROOT / "zoo_manifest.json"
 
-REQUIRED_FIELDS = {
-    "name",
-    "version",
-    "category",
-    "description",
-    "author",
-    "files",
-}
+REQUIRED_FIELDS = {"name", "version", "category", "description", "author", "files"}
 VALID_CATEGORIES = {
     "ui",
     "animation",
@@ -98,9 +103,7 @@ class ZooBuilder:
             return None
 
         if spec["category"] not in VALID_CATEGORIES:
-            self.warnings.append(
-                f"{name}: Unknown category '{spec['category']}'"
-            )
+            self.warnings.append(f"{name}: Unknown category '{spec['category']}'")
 
         # Check referenced files exist (handles both string and dict entries)
         for file_entry in spec.get("files", []):
@@ -235,9 +238,7 @@ class ZooBuilder:
 
     def _report(self):
         table = Table(
-            title="Build Summary",
-            show_header=True,
-            header_style="bold magenta",
+            title="Build Summary", show_header=True, header_style="bold magenta"
         )
         table.add_column("Metric", style="cyan")
         table.add_column("Count", justify="right", style="green")
