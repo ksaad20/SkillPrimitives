@@ -4,6 +4,7 @@ from pathlib import Path
 
 ROOT = Path(".")
 
+
 def strip_type_ignores(content: str) -> str:
     """Remove all '# type: ignore[...]' and '# type: ignore' comments."""
     return re.sub(r"\s*# type: ignore(?:\[.*?\])?", "", content)
