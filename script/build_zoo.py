@@ -65,7 +65,8 @@ class ZooBuilder:
         """Find all primitive directories."""
         if not self.primitives_dir.exists():
             console.print(
-                f"[red]Primitives directory not found: {self.primitives_dir}[/red]"
+                f"[red]Primitives directory not found: 
+{self.primitives_dir}[/red]"
             )
             sys.exit(1)
 
@@ -110,18 +111,20 @@ class ZooBuilder:
             if isinstance(file_entry, str):
                 src = primitive_dir / file_entry
                 if not src.exists():
-                    self.errors.append(f"{name}: Referenced file missing: {file_entry}")
+                    self.errors.append(f"{name}: Referenced file missing: 
+{file_entry}")
                     return None
             elif isinstance(file_entry, dict):
                 src = primitive_dir / file_entry["src"]
                 if not src.exists():
-                    self.errors.append(
-                        f"{name}: Referenced file missing: {file_entry['src']}"
+                    self.errors.append(f"{name}: Referenced file missing: 
+{file_entry['src']}"
                     )
                     return None
             else:
                 self.errors.append(
-                    f"{name}: Invalid file entry type: {type(file_entry)}"
+                    f"{name}: Invalid file entry type: 
+{type(file_entry)}"
                 )
                 return None
 
@@ -167,8 +170,8 @@ class ZooBuilder:
             "description": spec["description"],
             "author": spec["author"],
             "files": [
-                f if isinstance(f, str) else f.get("dest", f["src"])
-                for f in spec.get("files", [])
+                f if isinstance(f, str) else f.get("dest", f["src"]) for f in 
+spec.get("files", [])
             ],
             "built_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         }
@@ -230,9 +233,8 @@ class ZooBuilder:
         self._report()
         return len(self.errors) == 0
 
-    def _report(self):
-        table = Table(
-            title="Build Summary", show_header=True, header_style="bold magenta"
+    def _report(self): table = Table(title="Build Summary", show_header=True, header_style="bold 
+magenta"
         )
         table.add_column("Metric", style="cyan")
         table.add_column("Count", justify="right", style="green")
@@ -260,8 +262,8 @@ class ZooBuilder:
             from watchdog.events import FileSystemEventHandler
             from watchdog.observers import Observer
         except ImportError:
-            console.print(
-                "[red]watchdog required for --watch. " "Run: pip install watchdog[/red]"
+            console.print("[red]watchdog required for --watch. " "Run: pip
+install watchdog[/red]"
             )
             sys.exit(1)
 
@@ -301,8 +303,8 @@ class ZooBuilder:
 def main():
     parser = argparse.ArgumentParser(description="Build the skills primitive zoo")
     parser.add_argument("--watch", action="store_true", help="Watch mode")
-    parser.add_argument(
-        "--primitives", nargs="+", help="Build only specified primitives"
+    parser.add_argument("--primitives", nargs="+", help="Build only specified 
+primitives"
     )
     args = parser.parse_args()
 
