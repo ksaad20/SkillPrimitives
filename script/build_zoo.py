@@ -110,8 +110,7 @@ class ZooBuilder:
             if isinstance(file_entry, str):
                 src = primitive_dir / file_entry
                 if not src.exists():
-                    self.errors.append(f"{name}: Referenced file missing: 
-{file_entry}")
+                    self.errors.append(f"{name}: Referenced file missing:{file_entry}")
                     return None
             elif isinstance(file_entry, dict):
                 src = primitive_dir / file_entry["src"]
