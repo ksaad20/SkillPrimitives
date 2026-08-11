@@ -24,8 +24,22 @@ ZOO_DIR = PROJECT_ROOT / "zoo"
 TEMPLATES_DIR = PROJECT_ROOT / "templates"
 META_FILE = PROJECT_ROOT / "zoo_manifest.json"
 
-REQUIRED_FIELDS = {"name", "version", "category", "description", "author", "files"}
-VALID_CATEGORIES = {"ui", "animation", "layout", "interaction", "accessibility", "utility"}
+REQUIRED_FIELDS = {
+    "name",
+    "version",
+    "category",
+    "description",
+    "author",
+    "files",
+}
+VALID_CATEGORIES = {
+    "ui",
+    "animation",
+    "layout",
+    "interaction",
+    "accessibility",
+    "utility",
+}
 
 
 class ZooBuilder:
@@ -45,7 +59,9 @@ class ZooBuilder:
     def discover_primitives(self, names: Optional[set[str]] = None) -> list[Path]:
         """Find all primitive directories."""
         if not self.primitives_dir.exists():
-            console.print(f"[red]Primitives directory not found: {self.primitives_dir}[/red]")
+            console.print(
+                f"[red]Primitives directory not found: {self.primitives_dir}[/red]"
+            )
             sys.exit(1)
 
         candidates = [
@@ -82,22 +98,30 @@ class ZooBuilder:
             return None
 
         if spec["category"] not in VALID_CATEGORIES:
-            self.warnings.append(f"{name}: Unknown category '{spec['category']}'")
+            self.warnings.append(
+                f"{name}: Unknown category '{spec['category']}'"
+            )
 
         # Check referenced files exist (handles both string and dict entries)
         for file_entry in spec.get("files", []):
             if isinstance(file_entry, str):
                 src = primitive_dir / file_entry
                 if not src.exists():
-                    self.errors.append(f"{name}: Referenced file missing: {file_entry}")
+                    self.errors.append(
+                        f"{name}: Referenced file missing: {file_entry}"
+                    )
                     return None
             elif isinstance(file_entry, dict):
                 src = primitive_dir / file_entry["src"]
                 if not src.exists():
-                    self.errors.append(f"{name}: Referenced file missing: {file_entry['src']}")
+                    self.errors.append(
+                        f"{name}: Referenced file missing: {file_entry['src']}"
+                    )
                     return None
             else:
-                self.errors.append(f"{name}: Invalid file entry type: {type(file_entry)}")
+                self.errors.append(
+                    f"{name}: Invalid file entry type: {type(file_entry)}"
+                )
                 return None
 
         return spec
@@ -127,7 +151,7 @@ class ZooBuilder:
             template = self.env.get_template(template_name)
             rendered = template.render(
                 primitive=spec,
-                name=name, ft
+                name=name,
                 files=spec.get("files", []),
             )
             out_file = output_dir / spec.get("template_output", "index.html")
@@ -142,8 +166,8 @@ class ZooBuilder:
             "description": spec["description"],
             "author": spec["author"],
             "files": [
-                f if isinstance(f, str) else f.get("dest", f["src"]) for f in 
-spec.get("files", [])
+                f if isinstance(f, str) else f.get("dest", f["src"])
+                for f in spec.get("files", [])
             ],
             "built_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         }
@@ -171,16 +195,23 @@ spec.get("files", [])
             TextColumn("[progress.description]{task.description}"),
         ]
         if is_ci:
-            progress_columns = [TextColumn("[progress.description]{task.description}")]
+            progress_columns = [
+                TextColumn("[progress.description]{task.description}")
+            ]
 
         with Progress(
             *progress_columns,
             console=console,
         ) as progress:
-            task = progress.add_task("Building primitives...", total=len(primitives))
+            task = progress.add_task(
+                "Building primitives...", total=len(primitives)
+            )
 
             for primitive_dir in primitives:
-                progress.update(task, description=f"[cyan]Building {primitive_dir.name}...[/cyan]")
+                progress.update(
+                    task,
+                    description=f"[cyan]Building {primitive_dir.name}...[/cyan]",
+                )
 
                 spec = self.validate_primitive(primitive_dir)
                 if spec is None:
@@ -192,7 +223,9 @@ spec.get("files", [])
                 progress.advance(task)
 
         # Write manifest
-        self.manifest["generated_at"] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+        self.manifest["generated_at"] = time.strftime(
+            "%Y-%m-%dT%H:%M:%SZ", time.gmtime()
+        )
         with open(META_FILE, "w", encoding="utf-8") as f:
             json.dump(self.manifest, f, indent=2)
 
@@ -201,7 +234,11 @@ spec.get("files", [])
         return len(self.errors) == 0
 
     def _report(self):
-        table = Table(title="Build Summary", show_header=True, header_style="bold magenta")
+        table = Table(
+            title="Build Summary",
+            show_header=True,
+            header_style="bold magenta",
+        )
         table.add_column("Metric", style="cyan")
         table.add_column("Count", justify="right", style="green")
 
@@ -228,7 +265,10 @@ spec.get("files", [])
             from watchdog.events import FileSystemEventHandler
             from watchdog.observers import Observer
         except ImportError:
-            console.print("[red]watchdog required for --watch. Run: pip install watchdog[/red]")
+            console.print(
+                "[red]watchdog required for --watch. "
+                "Run: pip install watchdog[/red]"
+            )
             sys.exit(1)
 
         class RebuildHandler(FileSystemEventHandler):
@@ -242,12 +282,16 @@ spec.get("files", [])
                 now = time.time()
                 if now - self.debounce > 1.0:
                     self.debounce = now
-                    console.print(f"[yellow]Change detected: {event.src_path}[/yellow]")
+                    console.print(
+                        f"[yellow]Change detected: {event.src_path}[/yellow]"
+                    )
                     self.builder.build()
                     console.rule()
 
         console.rule("[bold blue]Watch Mode[/bold blue]")
-        console.print("Monitoring primitives/ for changes... (Ctrl+C to stop)")
+        console.print(
+            "Monitoring primitives/ for changes... (Ctrl+C to stop)"
+        )
 
         self.build()
         handler = RebuildHandler(self)
@@ -267,7 +311,9 @@ spec.get("files", [])
 def main():
     parser = argparse.ArgumentParser(description="Build the skills primitive zoo")
     parser.add_argument("--watch", action="store_true", help="Watch mode")
-    parser.add_argument("--primitives", nargs="+", help="Build only specified primitives")
+    parser.add_argument(
+        "--primitives", nargs="+", help="Build only specified primitives"
+    )
     args = parser.parse_args()
 
     builder = ZooBuilder(PRIMITIVES_DIR, ZOO_DIR, TEMPLATES_DIR)
